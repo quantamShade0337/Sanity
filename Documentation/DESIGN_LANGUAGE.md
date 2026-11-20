@@ -71,6 +71,22 @@ decision this page doesn't cover, copy what the Dashboard does.
   the dismiss control beside what it dismisses, never pushed to the far edge.
 - Honour Reduce Motion for every animation.
 
+## Screen types
+
+Every screen uses the same tokens, but each type has its own composition.
+Don't copy the Dashboard's layout onto a screen that has a different job.
+
+| Type | Screens | Composition |
+|---|---|---|
+| Instrument | Dashboard | Identity line, one verdict, readings strip, ranked list, details |
+| Settings form | General, Energy, Monitor, Notch, Clipboard and most pages | Native grouped `Form`; one sentence of introduction on the form grid; page name in the title bar |
+| Catalog | Features | Form rows with plain symbols (full strength when installed, tertiary when not), bordered buttons only, badges as plain text |
+| Identity | About | App icon, name and version centred on the page, links as one line, then native form sections |
+| Document | What's New | One left-aligned column on the form grid at a 600 pt measure, version as an eyebrow, neutral dot bullets |
+| Appeal | Support | Centred message with one prominent action, then hairline-separated rows |
+| Glance | Menu bar panel | Compact: eyebrow labels, a mini readings strip that opens the Dashboard, one bordered "Open Sanity" with the mark |
+| Welcome | Onboarding | Apple welcome-sheet pattern: app icon, plain title, accent symbols, no banners |
+
 ## Notch alerts
 
 Sanity's notch alerts copy the iPhone Dynamic Island compact layout: same

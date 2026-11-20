@@ -60,12 +60,15 @@ struct NotchSettingsView: View {
                 }
                 .labelsHidden()
                 .pickerStyle(.menu)
-                .frame(width: 170)
+                .fixedSize()
             }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 17)
-
-            Divider()
+            // On the grouped-form grid like every other page's introduction,
+            // with no full-bleed rule: the form's own sections start below.
+            .padding(.horizontal, GroupedFormMetrics.rowInset)
+            .frame(maxWidth: GroupedFormMetrics.maxWidth, alignment: .leading)
+            .padding(.horizontal, GroupedFormMetrics.outerMargin)
+            .padding(.top, 18)
+            .frame(maxWidth: .infinity)
 
             Group {
                 switch selectedSection {

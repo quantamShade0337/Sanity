@@ -31,7 +31,15 @@ struct FocusedMenuBarPanel: View {
             Divider()
                 .padding(.vertical, 12)
 
-            SystemGlanceRow(snapshot: monitor.snapshot)
+            // The glance is a doorway: clicking it opens the full Dashboard.
+            Button {
+                openSanity(.dashboard)
+            } label: {
+                SystemGlanceRow(snapshot: monitor.snapshot, language: l10n.language)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .help(GuideText.t(.dashTitle, l10n.language))
 
             Divider()
                 .padding(.top, 12)
@@ -165,26 +173,31 @@ struct FocusedMenuBarPanel: View {
             .padding(.vertical, 3)
     }
 
+    private func openSanity(_ page: SettingsPage) {
+        appDelegate()?.closePopover {
+            SettingsRouter.shared.page = page
+            appDelegate()?.openSettingsWindow()
+        }
+    }
+
     private var footer: some View {
         HStack(spacing: 8) {
+            // Opens Sanity's home, the Dashboard, carrying the brand mark.
             Button {
-                appDelegate()?.closePopover {
-                    SettingsRouter.shared.page = .features
-                    appDelegate()?.openSettingsWindow()
-                }
+                openSanity(.dashboard)
             } label: {
-                Text("Open Sanity")
-                    .font(.system(size: 12, weight: .semibold))
-                    .frame(maxWidth: .infinity)
+                HStack(spacing: 6) {
+                    BrandMarkInBrandColour()
+                    Text("Open Sanity")
+                        .font(.system(size: 12, weight: .medium))
+                }
+                .frame(maxWidth: .infinity)
             }
             .controlSize(.large)
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.bordered)
 
             Button {
-                appDelegate()?.closePopover {
-                    SettingsRouter.shared.page = .general
-                    appDelegate()?.openSettingsWindow()
-                }
+                openSanity(.general)
             } label: {
                 Image(systemName: "gearshape")
                     .frame(width: 16, height: 16)
@@ -197,9 +210,9 @@ struct FocusedMenuBarPanel: View {
     }
 
     private func sectionLabel(_ title: String) -> some View {
-        Text(title.uppercased())
-            .font(.system(size: 10, weight: .semibold))
-            .tracking(0.6)
+        Text(title.uppercased(with: Locale.current))
+            .font(SanityDesign.Typography.eyebrow)
+            .tracking(SanityDesign.Typography.eyebrowTracking)
             .foregroundStyle(.secondary)
     }
 
@@ -295,38 +308,54 @@ private struct ActiveAppVolumeRow: View {
     }
 }
 
+private struct BrandMarkInBrandColour: View {
+    @Environment(\.colorScheme) private var scheme
+    var body: some View {
+        BrandMark(width: 15, tint: SanityDesign.brand(scheme))
+            .accessibilityHidden(true)
+    }
+}
+
+/// A compact version of the Dashboard's readings strip: the same words,
+/// the same rounded numerals with smaller units, hairline dividers.
 private struct SystemGlanceRow: View {
     let snapshot: SystemSnapshot
+    let language: AppLanguage
 
     var body: some View {
         HStack(spacing: 0) {
-            glance("CPU", value: snapshot.cpuUsage.map(percent) ?? "—")
-            glance("RAM", value: memoryPercent)
-            glance("Battery", value: snapshot.power?.chargePercent.map { "\($0)%" } ?? "—")
+            reading(GuideText.t(.processor, language), percent: snapshot.cpuUsage)
+            SanityHairline(axis: .vertical).padding(.horizontal, 12)
+            reading(GuideText.t(.memory, language), percent: memoryFraction)
+            SanityHairline(axis: .vertical).padding(.horizontal, 12)
+            reading(GuideText.t(.battery, language),
+                    percent: snapshot.power?.chargePercent.map { Double($0) / 100 })
         }
+        .fixedSize(horizontal: false, vertical: true)
         .accessibilityElement(children: .combine)
     }
 
-    private func glance(_ label: String, value: String) -> some View {
-        HStack(spacing: 4) {
+    private func reading(_ label: String, percent: Double?) -> some View {
+        VStack(alignment: .leading, spacing: 1) {
             Text(label)
+                .font(SanityDesign.Typography.caption.weight(.medium))
                 .foregroundStyle(.secondary)
-            Text(value)
-                .fontWeight(.medium)
-                .monospacedDigit()
+                .lineLimit(1)
+            HStack(alignment: .firstTextBaseline, spacing: 1) {
+                Text(percent.map { "\(Int(($0 * 100).rounded()))" } ?? "—")
+                    .font(.system(size: 16, weight: .medium, design: .rounded).monospacedDigit())
+                if percent != nil {
+                    Text("%")
+                        .font(.system(size: 10, weight: .medium, design: .rounded))
+                        .foregroundStyle(.secondary)
+                }
+            }
         }
-        .font(.system(size: 10.5))
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private var memoryPercent: String {
-        guard let used = snapshot.memoryUsed,
-              let total = snapshot.memoryTotal,
-              total > 0 else { return "—" }
-        return percent(Double(used) / Double(total))
-    }
-
-    private func percent(_ value: Double) -> String {
-        "\(Int((value * 100).rounded()))%"
+    private var memoryFraction: Double? {
+        guard let used = snapshot.memoryUsed, let total = snapshot.memoryTotal, total > 0 else { return nil }
+        return Double(used) / Double(total)
     }
 }

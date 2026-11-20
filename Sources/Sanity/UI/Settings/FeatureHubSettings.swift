@@ -167,17 +167,14 @@ struct FeatureHubSettings: View {
     /// click away in the list below.
     private var presetsSection: some View {
         Section {
-            HStack(alignment: .top, spacing: 8) {
-                ForEach(FeaturePreset.allCases) { preset in
-                    PresetCard(preset: preset,
-                               name: presetName(preset),
-                               caption: presetDescription(preset),
-                               applyTitle: hub.presetApplyButton) {
-                        confirmingPreset = preset
-                    }
+            ForEach(FeaturePreset.allCases) { preset in
+                PresetRow(preset: preset,
+                          name: presetName(preset),
+                          caption: presetDescription(preset),
+                          applyTitle: hub.presetApplyButton) {
+                    confirmingPreset = preset
                 }
             }
-            .padding(.vertical, 2)
         } header: {
             Text(hub.presetsTitle)
         } footer: {
@@ -248,9 +245,10 @@ struct FeatureHubSettings: View {
     }
 }
 
-// MARK: - Preset card
+// MARK: - Preset row
 
-private struct PresetCard: View {
+/// A preset as an ordinary form row: what it is, what it installs, Apply.
+private struct PresetRow: View {
     let preset: FeaturePreset
     let name: String
     let caption: String
@@ -258,31 +256,23 @@ private struct PresetCard: View {
     let onApply: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 6) {
-                Image(systemName: preset.symbolName)
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(Color.accentColor)
-                Text(name)
-                    .font(.system(size: 12, weight: .semibold))
-                    .lineLimit(1)
-            }
-            Text(caption)
-                .font(.caption2)
+        HStack(spacing: 12) {
+            Image(systemName: preset.symbolName)
+                .font(.system(size: 15))
                 .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            Spacer(minLength: 0)
+                .frame(width: 24)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(name)
+                Text(caption)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 8)
             Button(applyTitle, action: onApply)
-                .buttonStyle(.bordered)
                 .controlSize(.small)
         }
-        .padding(9)
-        .frame(maxWidth: .infinity, minHeight: 96, alignment: .topLeading)
-        .background(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(Color.secondary.opacity(0.08))
-        )
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(name). \(caption)")
     }
@@ -363,8 +353,10 @@ private struct FeatureHubRow: View {
                 }
                 .help(reason)
             } else {
+                // Bordered, not prominent: forty identical blue buttons on
+                // one page would leave nothing that reads as primary.
                 Button(hub.installButton) { flip(to: true) }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.bordered)
                     .controlSize(.small)
                     .accessibilityLabel("\(hub.installButton) \(accessibilityTitle)")
             }
@@ -379,27 +371,19 @@ private struct FeatureHubRow: View {
 
     private func rowContent(showsChevron: Bool) -> some View {
         HStack(spacing: 10) {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(installed
-                        ? AnyShapeStyle(Color.accentColor)
-                        : AnyShapeStyle(Color.secondary.opacity(0.22)))
-                .frame(width: 30, height: 30)
-                .overlay(
-                    Image(systemName: symbolName)
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(installed ? AnyShapeStyle(.white) : AnyShapeStyle(.secondary))
-                )
+            Image(systemName: symbolName)
+                .font(.system(size: 15))
+                .foregroundStyle(installed ? AnyShapeStyle(.primary) : AnyShapeStyle(.tertiary))
+                .frame(width: 24)
+                .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(feature.hubTitle(l10n.s, hub: hub))
                         .foregroundStyle(installed ? AnyShapeStyle(.primary) : AnyShapeStyle(.secondary))
                     if feature.isBeta {
                         Text(l10n.s.betaBadge)
-                            .font(.system(size: 8, weight: .bold))
-                            .foregroundStyle(Color.white)
-                            .padding(.horizontal, 5)
-                            .padding(.vertical, 1)
-                            .background(Capsule().fill(Color.accentColor))
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(.orange)
                             .accessibilityHidden(true)
                     }
                     ForEach(feature.permissions, id: \.self) { permission in
@@ -410,11 +394,8 @@ private struct FeatureHubRow: View {
                             .accessibilityHidden(true)
                     }
                     Text(energyLabel)
-                        .font(.system(size: 9))
+                        .font(.system(size: 10))
                         .foregroundStyle(.tertiary)
-                        .padding(.horizontal, 5)
-                        .padding(.vertical, 1)
-                        .background(Capsule().fill(Color.secondary.opacity(0.12)))
                         .help(hub.energyHelp)
                         .accessibilityHidden(true)
                 }

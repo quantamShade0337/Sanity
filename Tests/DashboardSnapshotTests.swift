@@ -34,6 +34,11 @@ final class DashboardSnapshotTests: XCTestCase {
             ("window-features", .features, .aqua, window),
             ("window-notch", .notch, .aqua, window),
             ("window-general-min", .general, .aqua, NSSize(width: 780, height: 640)),
+            ("window-about", .about, .aqua, window),
+            ("window-whatsnew", .releaseNotes, .aqua, window),
+            ("window-support", .support, .aqua, window),
+            ("window-energy", .energy, .aqua, window),
+            ("window-shortcuts", .shortcuts, .aqua, window),
         ] {
             router.page = page
             try render(SettingsView(), name: name, appearance: appearance, size: size, settle: 6)
@@ -47,6 +52,13 @@ final class DashboardSnapshotTests: XCTestCase {
         UserDefaults.standard.set(true, forKey: detailsKey)
         try render(DashboardView(), name: "dashboard-full", appearance: .aqua,
                    size: NSSize(width: 840, height: 1400), settle: 3)
+    }
+
+    func testRenderMenuPanel() throws {
+        for (name, appearance) in [("panel-light", NSAppearance.Name.aqua), ("panel-dark", .darkAqua)] {
+            try render(FocusedMenuBarPanel(), name: name, appearance: appearance,
+                       size: NSSize(width: 356, height: 420), settle: 3)
+        }
     }
 
     func testRenderIsland() throws {

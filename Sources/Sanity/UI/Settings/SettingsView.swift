@@ -1607,64 +1607,79 @@ struct SwitcherSettings: View {
 struct AboutSettings: View {
     @ObservedObject private var l10n = L10n.shared
 
+    /// An identity screen: the app's mark and name stand on the page itself,
+    /// centred, the way macOS About windows present an app. Only the update
+    /// controls, which are settings, sit in a grouped form section.
     var body: some View {
-        Form {
-            Section {
-                aboutContent
+        VStack(spacing: 0) {
+            identity
+                .padding(.top, 24)
+            Form {
+                UpdatesView()
             }
-
-            UpdatesView()
+            .formStyle(.grouped)
         }
-        .formStyle(.grouped)
     }
 
-    private var aboutContent: some View {
-        VStack(spacing: 14) {
-            BrandBadge(size: 76)
-            VStack(spacing: 3) {
-                Text(AppInfo.name)
-                    .font(.title2.bold())
-                HStack(spacing: 6) {
-                    Text("\(l10n.s.versionPrefix) \(AppInfo.version)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    if AppInfo.isBeta {
-                        Text(l10n.s.betaBadgeLabel)
-                            .font(.system(size: 9, weight: .bold))
-                            .padding(.horizontal, 5)
-                            .padding(.vertical, 1.5)
-                            .background(Color.orange.opacity(0.18))
-                            .foregroundStyle(.orange)
-                            .clipShape(Capsule())
-                    }
-                }
-                if AppInfo.isDeveloperBuild, let commit = AppInfo.buildCommit {
-                    // Dev-only: which source commit this build came from. Never shipped.
-                    Text(commit)
-                        .font(.caption2.monospaced())
-                        .foregroundStyle(.tertiary)
-                        .textSelection(.enabled)
+    private var identity: some View {
+        VStack(spacing: 0) {
+            Image(nsImage: NSApp.applicationIconImage)
+                .resizable()
+                .frame(width: 96, height: 96)
+                .accessibilityHidden(true)
+            Text(AppInfo.name)
+                .font(SanityDesign.Typography.display)
+                .foregroundStyle(.primary)
+                .padding(.top, 10)
+            HStack(spacing: 6) {
+                Text("\(l10n.s.versionPrefix) \(AppInfo.version)")
+                    .monospacedDigit()
+                if AppInfo.isBeta {
+                    Text(l10n.s.betaBadgeLabel)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.orange)
                 }
             }
+            .font(SanityDesign.Typography.secondary)
+            .foregroundStyle(.secondary)
+            .padding(.top, 2)
+            if AppInfo.isDeveloperBuild, let commit = AppInfo.buildCommit {
+                // Dev-only: which source commit this build came from. Never shipped.
+                Text(commit)
+                    .font(.caption2.monospaced())
+                    .foregroundStyle(.tertiary)
+                    .textSelection(.enabled)
+                    .padding(.top, 2)
+            }
             Text(l10n.s.aboutDescription)
-                .font(.system(size: 12))
-                .multilineTextAlignment(.center)
+                .font(SanityDesign.Typography.body)
                 .foregroundStyle(.secondary)
-            HStack(spacing: 12) {
-                Button(l10n.s.reviewIntro) {
-                    appDelegate()?.showOnboarding()
-                }
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: 440)
+                .padding(.top, 14)
+            // Secondary actions read as one line of links, not three buttons
+            // competing with the update controls below.
+            HStack(spacing: 6) {
+                Button(l10n.s.reviewIntro) { appDelegate()?.showOnboarding() }
+                Text("·").foregroundStyle(.tertiary)
                 Button(l10n.s.reviewHighlights) {
                     appDelegate()?.showUpdateHighlights(includeSupportIntro: true)
                 }
+                Text("·").foregroundStyle(.tertiary)
                 Link(l10n.s.viewOnGitHub, destination: AppInfo.repositoryURL)
             }
+            .buttonStyle(.link)
+            .font(SanityDesign.Typography.secondary)
+            .padding(.top, 14)
             Text(AppInfo.copyright)
-                .font(.caption2)
+                .font(SanityDesign.Typography.caption)
                 .foregroundStyle(.tertiary)
+                .padding(.top, 18)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 20)
+        .padding(.top, 8)
+        .padding(.bottom, 16)
     }
 }
 
@@ -1675,40 +1690,42 @@ struct ReleaseNotesSettings: View {
     private let notes = ReleaseNotes.current
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(l10n.s.obWhatsNewTitle)
-                    .font(.title2.bold())
-                Text(versionLine)
-                    .font(.caption)
+        // A document: one scrolling column on the same grid as the forms,
+        // held to a readable measure. The window title already names the page,
+        // so the version line is the only heading it needs.
+        ScrollView {
+            VStack(alignment: .leading, spacing: 28) {
+                Text(versionLine.uppercased(with: Locale.current))
+                    .font(SanityDesign.Typography.eyebrow)
+                    .tracking(SanityDesign.Typography.eyebrowTracking)
                     .foregroundStyle(.secondary)
-            }
-            .padding(.horizontal, 24)
-            .padding(.top, 24)
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    if notes.sections.isEmpty {
-                        fallbackNote
-                    } else {
-                        ForEach(Array(notes.sections.enumerated()), id: \.offset) { _, section in
-                            releaseSection(section)
-                        }
+                if notes.sections.isEmpty {
+                    fallbackNote
+                } else {
+                    ForEach(Array(notes.sections.enumerated()), id: \.offset) { _, section in
+                        releaseSection(section)
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 24)
-                .padding(.bottom, 24)
             }
+            .frame(maxWidth: 600, alignment: .leading)
+            .padding(.horizontal, GroupedFormMetrics.rowInset)
+            .frame(maxWidth: GroupedFormMetrics.maxWidth, alignment: .leading)
+            .padding(.horizontal, GroupedFormMetrics.outerMargin)
+            .padding(.top, 20)
+            .padding(.bottom, 40)
+            .frame(maxWidth: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     private var versionLine: String {
+        // "v" only prefixes real version numbers, never words like "Unreleased".
+        let version = notes.version.first?.isNumber == true
+            ? "\(l10n.s.versionPrefix) \(notes.version)" : notes.version
         if let date = notes.date {
-            return "v\(notes.version) · \(date)"
+            return "\(version) · \(date)"
         }
-        return "v\(notes.version)"
+        return version
     }
 
     private var fallbackNote: some View {
@@ -1725,12 +1742,11 @@ struct ReleaseNotesSettings: View {
     }
 
     private func releaseSection(_ section: ReleaseNoteSection) -> some View {
-        VStack(alignment: .leading, spacing: 9) {
+        VStack(alignment: .leading, spacing: 10) {
             if !section.title.isEmpty {
-                Text(section.title.uppercased())
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(.secondary)
-                    .tracking(1.2)
+                Text(section.title)
+                    .font(SanityDesign.Typography.section)
+                    .accessibilityAddTraits(.isHeader)
             }
             ForEach(Array(section.items.enumerated()), id: \.offset) { _, item in
                 releaseItem(item, sectionTitle: section.title)
@@ -1743,17 +1759,22 @@ struct ReleaseNotesSettings: View {
         switch item {
         case let .paragraph(text):
             Text(text)
-                .font(.system(size: 12.8))
+                .font(.system(size: 13))
+                .lineSpacing(3)
                 .foregroundStyle(.primary)
                 .fixedSize(horizontal: false, vertical: true)
         case let .bullet(text):
-            HStack(alignment: .top, spacing: 9) {
-                Image(systemName: iconName(for: sectionTitle))
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(Color.accentColor)
-                    .frame(width: 18, alignment: .center)
+            // A quiet dot: the section title already says added, changed or
+            // fixed, so repeating it as a coloured icon on every line is noise.
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                Circle()
+                    .fill(Color.secondary.opacity(0.6))
+                    .frame(width: 4, height: 4)
+                    .alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] + 4 }
+                    .accessibilityHidden(true)
                 Text(text)
-                    .font(.system(size: 12.5))
+                    .font(.system(size: 13))
+                    .lineSpacing(2)
                     .foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -1768,7 +1789,7 @@ struct ReleaseNotesSettings: View {
                             .stroke(.quaternary, lineWidth: 1)
                     )
                     .accessibilityLabel(image.alt)
-                    .padding(.leading, 27)
+                    .padding(.leading, 14)
             }
         }
     }
@@ -1792,15 +1813,6 @@ struct ReleaseNotesSettings: View {
                                         subdirectory: subdirectory) else { return nil }
         return NSImage(contentsOf: url)
     }
-
-    private func iconName(for title: String) -> String {
-        switch title.lowercased() {
-        case "added": return "plus.circle.fill"
-        case "changed": return "slider.horizontal.3"
-        case "fixed": return "checkmark.circle.fill"
-        default: return "circle.fill"
-        }
-    }
 }
 
 // MARK: - Support and community
@@ -1809,29 +1821,27 @@ struct SupportSettings: View {
     @ObservedObject private var l10n = L10n.shared
     @Environment(\.openURL) private var openURL
 
+    /// An appeal, so centred: one message and one primary action, then two
+    /// smaller ways to help as hairline-separated rows rather than cards.
     var body: some View {
         ScrollView {
-            VStack(spacing: 18) {
-                ZStack {
-                    Circle()
-                        .fill(Theme.spaceGradient)
-                        .frame(width: 78, height: 78)
-                    Image(systemName: "heart.fill")
-                        .font(.system(size: 29, weight: .semibold))
-                        .foregroundStyle(.white)
-                }
+            VStack(spacing: 0) {
+                Image(systemName: "heart.fill")
+                    .font(.system(size: 34))
+                    .foregroundStyle(.pink)
+                    .accessibilityHidden(true)
 
-                VStack(spacing: 7) {
-                    Text(l10n.s.donateHeading)
-                        .font(.title2.bold())
-                        .multilineTextAlignment(.center)
-                    Text(l10n.s.donateMessage)
-                        .font(.system(size: 13.5))
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: 460)
-                }
+                Text(l10n.s.donateHeading)
+                    .font(SanityDesign.Typography.display)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 14)
+                Text(l10n.s.donateMessage)
+                    .font(SanityDesign.Typography.body)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: 440)
+                    .padding(.top, 6)
 
                 Button {
                     openURL(AppInfo.coffeeURL)
@@ -1840,85 +1850,66 @@ struct SupportSettings: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
+                .padding(.top, 20)
 
-                HStack(alignment: .top, spacing: 14) {
-                    Image(systemName: "star.fill")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(.yellow)
-                        .frame(width: 38, height: 38)
-                        .background(Circle().fill(Color.yellow.opacity(0.14)))
-
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text(l10n.s.supportIntroStarMessage)
-                            .font(.system(size: 13.5, weight: .medium))
-                            .fixedSize(horizontal: false, vertical: true)
-
+                VStack(spacing: 0) {
+                    SanityHairline()
+                    supportRow(icon: AnyView(Image(systemName: "star.fill")
+                                    .font(.system(size: 15))
+                                    .foregroundStyle(.secondary)),
+                               text: l10n.s.supportIntroStarMessage) {
                         Button {
                             openURL(AppInfo.repositoryURL)
                         } label: {
-                            Label(l10n.s.supportIntroStarButton, systemImage: "star.fill")
+                            Text(l10n.s.supportIntroStarButton)
                         }
-                        .buttonStyle(.bordered)
-                        .controlSize(.large)
+                        .controlSize(.small)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .padding(16)
-                .frame(maxWidth: 510)
-                .background(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(Color(nsColor: .controlBackgroundColor))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .strokeBorder(Color(nsColor: .separatorColor).opacity(0.45))
-                )
-
-                HStack(alignment: .top, spacing: 14) {
-                    DiscordMark(width: 24)
-                        .frame(width: 38, height: 38)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .fill(Color(red: 0.35, green: 0.40, blue: 0.94))
-                        )
-
-                    VStack(alignment: .leading, spacing: 7) {
-                        Text(l10n.s.discordIntroTitle)
-                            .font(.headline)
-                        Text(l10n.s.discordIntroMessage)
-                            .font(.system(size: 13))
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-
+                    SanityHairline()
+                    supportRow(icon: AnyView(Image(systemName: "bubble.left.and.bubble.right.fill")
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(.secondary)),
+                               text: l10n.s.discordIntroMessage) {
                         communityActions
-                            .padding(.top, 3)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    SanityHairline()
                 }
-                .padding(16)
-                .frame(maxWidth: 510)
-                .background(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(Color(nsColor: .controlBackgroundColor))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .strokeBorder(Color(nsColor: .separatorColor).opacity(0.45))
-                )
+                .frame(maxWidth: 520)
+                .padding(.top, 36)
 
                 Text(l10n.s.donateThanks)
-                    .font(.caption)
+                    .font(SanityDesign.Typography.caption)
                     .foregroundStyle(.tertiary)
+                    .padding(.top, 20)
             }
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 28)
-            .padding(.vertical, 26)
+            .padding(.top, 36)
+            .padding(.bottom, 28)
         }
+    }
+
+    private func supportRow<Actions: View>(icon: AnyView, text: String,
+                                           @ViewBuilder actions: () -> Actions) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            icon
+                .frame(width: 22, height: 20)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 10) {
+                Text(text)
+                    .font(SanityDesign.Typography.body)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                actions()
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(.vertical, 16)
     }
 
     private var communityActions: some View {
         ViewThatFits(in: .horizontal) {
-            HStack(spacing: 9) {
+            HStack(spacing: 8) {
                 discordButton
                 socialButton
             }
@@ -1933,14 +1924,9 @@ struct SupportSettings: View {
         Button {
             openURL(AppInfo.discordURL)
         } label: {
-            HStack(spacing: 8) {
-                DiscordMark(width: 19)
-                Text(l10n.s.discordIntroJoinButton)
-            }
+            Text(l10n.s.discordIntroJoinButton)
         }
-        .buttonStyle(.borderedProminent)
-        .controlSize(.large)
-        .tint(Color(red: 0.35, green: 0.40, blue: 0.94))
+        .controlSize(.small)
     }
 
     private var socialButton: some View {
@@ -1950,12 +1936,11 @@ struct SupportSettings: View {
             HStack(spacing: 7) {
                 XLogoShape()
                     .fill(Color.primary, style: FillStyle(eoFill: true))
-                    .frame(width: 12, height: 12)
+                    .frame(width: 10, height: 10)
                 Text(l10n.s.communityIntroFollowButton)
             }
         }
-        .buttonStyle(.bordered)
-        .controlSize(.large)
+        .controlSize(.small)
     }
 }
 

@@ -47,8 +47,8 @@ struct InlineHUD: View {
                                 .symbolVariant(value > 0 ? .none : .slash)
                                 .contentTransition(.interpolate)
                                 .frame(width: 20, height: 15, alignment: .center)
-                        case .keepAwake:
-                            Image(systemName: value > 0 ? "cup.and.heat.waves.fill" : "cup.and.saucer")
+                        case .event:
+                            Image(systemName: icon.isEmpty ? "sparkles" : icon)
                                 .contentTransition(.interpolate)
                                 .frame(width: 20, height: 15, alignment: .center)
                         default:
@@ -72,8 +72,8 @@ struct InlineHUD: View {
                 .frame(width: vm.closedNotchSize.width - 20)
             
             HStack {
-                if (type == .mic || type == .keepAwake) {
-                    Text(type == .keepAwake ? (value.isZero ? "off" : "on") : (value.isZero ? "muted" : "unmuted"))
+                if (type == .mic || type == .event) {
+                    Text(type == .event ? BoringViewCoordinator.shared.sneakPeek.label : (value.isZero ? "muted" : "unmuted"))
                         .foregroundStyle(.gray)
                         .lineLimit(1)
                         .allowsTightening(true)
@@ -151,8 +151,8 @@ struct InlineHUD: View {
                 return "Backlight"
             case .mic:
                 return "Mic"
-            case .keepAwake:
-                return "Awake"
+            case .event:
+                return "Sanity"
             default:
                 return ""
         }

@@ -64,7 +64,7 @@ enum SettingsDirectory {
         let quitProtection = FeatureStrings.quitProtection(language)
         return [
             (categories.essentials, [
-                SettingsDirectoryItem(page: .dashboard, title: "Dashboard",
+                SettingsDirectoryItem(page: .dashboard, title: GuideText.t(.dashTitle, language),
                                       icon: "gauge.with.dots.needle.67percent",
                                       keywords: ["CPU", "GPU", "memory", "RAM", "disk", "storage",
                                                  "network", "battery", "processes", "overview", "stats"]),

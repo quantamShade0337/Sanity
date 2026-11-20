@@ -511,6 +511,9 @@ struct PanelOrderEditor: View {
         .padding(.vertical, 2)
         .onAppear { order = PanelLayout.order }
         .onChange(of: showFanControl) { _, _ in order = PanelLayout.order }
+        .onReceive(NotificationCenter.default.publisher(for: PanelLayout.visibilityPresetApplied)) { _ in
+            visibilityChanges += 1
+        }
     }
 
     private var editableOrder: [PanelSectionID] {

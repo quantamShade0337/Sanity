@@ -55,15 +55,15 @@ struct SystemEventIndicatorModifier: View {
                         .contentTransition(.interpolate)
                         .frame(width: 20, height: 15)
                         .foregroundStyle(.white)
-                case .keepAwake:
-                    Image(systemName: value > 0 ? "cup.and.heat.waves.fill" : "cup.and.saucer")
+                case .event:
+                    Image(systemName: icon.isEmpty ? "sparkles" : icon)
                         .contentTransition(.interpolate)
                         .frame(width: 20, height: 15)
                         .foregroundStyle(.white)
                 default:
                     EmptyView()
             }
-            if (eventType != .mic && eventType != .keepAwake) {
+            if (eventType != .mic && eventType != .event) {
                 DraggableProgressBar(value: $value)
                 if Defaults[.showClosedNotchHUDPercentage] {
                     Text("\(Int(value * 100))%")
@@ -73,7 +73,7 @@ struct SystemEventIndicatorModifier: View {
                         .frame(width: 35, alignment: .trailing)
                 }
             } else {
-                Text(eventType == .keepAwake ? "Keep Awake \(value > 0 ? "on" : "off")" : "Mic \(value > 0 ? "unmuted" : "muted")")
+                Text(eventType == .event ? BoringViewCoordinator.shared.sneakPeek.label : "Mic \(value > 0 ? "unmuted" : "muted")")
                     .foregroundStyle(.gray)
                     .lineLimit(1)
                     .allowsTightening(true)

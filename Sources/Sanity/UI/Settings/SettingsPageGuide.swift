@@ -21,40 +21,44 @@ enum SettingsPageGuide {
         .shortcuts, .about,
     ]
 
-    static func summary(for page: SettingsPage) -> String? {
+    static func summary(for page: SettingsPage,
+                        language: AppLanguage = L10n.shared.language) -> String? {
+        summaryKey(for: page).map { GuideText.t($0, language) }
+    }
+
+    static func summaryKey(for page: SettingsPage) -> GuideKey? {
         switch page {
-        case .dashboard: return nil
-        case .general: return "Basic options: start Sanity when you log in, change the language and appearance, and choose what the menu bar icon shows."
-        case .features: return "Turn whole features on or off. Anything you switch off here disappears from Sanity completely, so start small and add more later."
-        // The Notch page draws its own header with a section picker.
-        case .notch: return nil
-        case .energy: return "Keep your Mac awake, change screen brightness, and control what happens to Bluetooth when your Mac sleeps."
-        case .monitor: return "Choose which live stats (CPU, memory, temperature and more) appear in the menu bar, and how often they update."
-        case .mouse: return "Change how your mouse and trackpad behave: scroll direction, smooth scrolling, extra buttons and middle click."
-        case .switcher: return "A better app and window switcher, plus options for what clicking an app in the Dock does."
-        case .windowLayout: return "Snap windows to halves, thirds or corners of the screen with a shortcut or by dragging them to an edge."
-        case .autoQuit: return "Automatically quit apps you haven't used for a while, so they stop using memory and battery."
-        case .quitProtection: return "Stops ⌘Q and ⌘W from quitting apps or closing windows by accident: you can make them need a hold or a double press."
-        case .clipboard: return "Remembers what you copy so you can paste something from earlier. Your history stays on this Mac."
-        case .cutPaste: return "Adds real cut and paste for files in Finder, and quicker ways to rename files."
-        case .shelf: return "A temporary spot to drop files while you move them between windows or apps."
-        case .media: return "Convert, resize and crop images and PDFs, add watermarks, and rename files in bulk."
-        case .appUpdates: return "Checks the apps you have installed and tells you when updates are available."
-        case .cleaner: return "Finds caches, logs and leftover files you can safely remove to free up disk space."
-        case .homebrew: return "Manage Homebrew packages without the Terminal. Only useful if you already use Homebrew."
-        case .uninstaller: return "Removes an app together with the settings and support files it leaves behind."
-        case .killProcess: return "Force-quit apps or background processes that have stopped responding."
-        case .commandBar: return "A search bar you open with a shortcut to launch apps, run Sanity's tools, and jump to settings."
-        case .quickTools: return "Small tools you can open from anywhere: a quick launcher, toggles, microphone mute, a camera preview and a scratchpad."
-        case .screenshot: return "Take screenshots and screen recordings, pick colors, and copy text from anything on screen."
-        case .urlCleaner: return "Removes tracking junk from links you copy, so they're shorter and more private."
-        case .keyDebounce: return "Ignores accidental double key presses. Useful if your keyboard sometimes types a letter twice."
-        case .superKey: return "Turns a key you rarely use, like Caps Lock, into an extra modifier key for your own shortcuts."
-        case .textSnippets: return "Type a short abbreviation and Sanity replaces it with longer text you use often."
-        case .radialMenu: return "A circular menu that pops up under your pointer with the actions you choose."
-        case .shortcuts: return "Every keyboard shortcut Sanity uses, in one place. Change any of them here."
-        case .advanced: return "Back up or restore your settings, reset Sanity, and other options most people never need."
-        case .about, .releaseNotes, .support: return nil
+        // The Dashboard explains itself; the Notch page draws its own header;
+        // About, Release Notes and Support need no introduction.
+        case .dashboard, .notch, .about, .releaseNotes, .support: return nil
+        case .general: return .sumGeneral
+        case .features: return .sumFeatures
+        case .energy: return .sumEnergy
+        case .monitor: return .sumMonitor
+        case .mouse: return .sumMouse
+        case .switcher: return .sumSwitcher
+        case .windowLayout: return .sumWindowLayout
+        case .autoQuit: return .sumAutoQuit
+        case .quitProtection: return .sumQuitProtection
+        case .clipboard: return .sumClipboard
+        case .cutPaste: return .sumCutPaste
+        case .shelf: return .sumShelf
+        case .media: return .sumMedia
+        case .appUpdates: return .sumAppUpdates
+        case .cleaner: return .sumCleaner
+        case .homebrew: return .sumHomebrew
+        case .uninstaller: return .sumUninstaller
+        case .killProcess: return .sumKillProcess
+        case .commandBar: return .sumCommandBar
+        case .quickTools: return .sumQuickTools
+        case .screenshot: return .sumScreenshot
+        case .urlCleaner: return .sumURLCleaner
+        case .keyDebounce: return .sumKeyDebounce
+        case .superKey: return .sumSuperKey
+        case .textSnippets: return .sumTextSnippets
+        case .radialMenu: return .sumRadialMenu
+        case .shortcuts: return .sumShortcuts
+        case .advanced: return .sumAdvanced
         }
     }
 }
@@ -89,5 +93,78 @@ struct SettingsPageHeader: View {
         .padding(.bottom, 6)
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isHeader)
+    }
+}
+
+/// Warns at the top of a Settings page when a feature on it is switched on
+/// but macOS hasn't granted the permission it needs, with a one-click fix.
+struct PagePermissionBanner: View {
+    let page: SettingsPage
+    @ObservedObject private var l10n = L10n.shared
+    @ObservedObject private var permissions = Permissions.shared
+    @ObservedObject private var features = FeatureRuntime.shared
+
+    private struct Missing: Identifiable {
+        let permission: AppPermission
+        let featureNames: [String]
+        var id: AppPermission { permission }
+    }
+
+    private var missing: [Missing] {
+        let pageFeatures = Set(FeatureVisibilitySupport.features(for: page))
+        guard !pageFeatures.isEmpty else { return [] }
+        let defaults = UserDefaults.standard
+        let hub = FeatureStrings.hub(l10n.language)
+        var result: [Missing] = []
+        for (permission, granted) in [(AppPermission.accessibility, permissions.accessibility),
+                                      (.screenRecording, permissions.screenRecording)] where !granted {
+            let using = AppFeature.activeFeatures(
+                using: permission,
+                isAvailable: { features.isAvailable($0) },
+                boolFor: { defaults.bool(forKey: $0) },
+                stringFor: { defaults.string(forKey: $0) },
+                dataFor: { defaults.data(forKey: $0) })
+                .filter { pageFeatures.contains($0) }
+            if !using.isEmpty {
+                result.append(Missing(permission: permission,
+                                      featureNames: using.map { $0.hubTitle(l10n.s, hub: hub) }))
+            }
+        }
+        return result
+    }
+
+    var body: some View {
+        let items = missing
+        if !items.isEmpty {
+            VStack(spacing: 6) {
+                ForEach(items) { item in
+                    HStack(spacing: 10) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.orange)
+                            .accessibilityHidden(true)
+                        Text(GuideText.f(item.permission == .accessibility ? .needsAccessibility : .needsScreenRecording,
+                                         ListFormatter.localizedString(byJoining: item.featureNames),
+                                         language: l10n.language))
+                            .font(.callout)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Spacer(minLength: 8)
+                        Button(GuideText.t(.openSystemSettings, l10n.language)) {
+                            if item.permission == .accessibility {
+                                permissions.requestAccessibility()
+                            } else {
+                                permissions.requestScreenRecording()
+                            }
+                        }
+                        .controlSize(.small)
+                    }
+                    .padding(10)
+                    .background(Color.orange.opacity(0.12),
+                                in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .accessibilityElement(children: .combine)
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 6)
+        }
     }
 }

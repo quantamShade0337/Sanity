@@ -51,7 +51,7 @@ struct NotchSettingsView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text("Notch")
                         .font(.title2.weight(.semibold))
-                    Text("Shows music, volume, brightness and battery in a small panel at the top of your screen, around the camera notch.")
+                    Text(GuideText.t(.notchSubtitle))
                         .font(.callout)
                         .foregroundStyle(.secondary)
                 }
@@ -121,6 +121,7 @@ struct NotchGeneralSettings: View {
 
     var body: some View {
         Form {
+            SanityNotchEventsSection()
             Section {
                 Defaults.Toggle(key: .showOnAllDisplays) {
                     Text("Show on all displays")
@@ -1743,4 +1744,39 @@ func warningBadge(_ text: String, _ description: String) -> some View {
 
 #Preview {
     HUD()
+}
+
+
+/// Toggles for Sanity's own events (Keep Awake, copied, screenshot saved,
+/// sound output changed) that flash briefly in the notch.
+struct SanityNotchEventsSection: View {
+    @ObservedObject private var l10n = L10n.shared
+
+    var body: some View {
+        Section {
+            ForEach(NotchSanityEvent.allCases) { event in
+                SanityNotchEventToggle(event: event, title: GuideText.t(event.titleKey, l10n.language))
+            }
+        } header: {
+            Text(GuideText.t(.notchEventsSection, l10n.language))
+        } footer: {
+            Text(GuideText.t(.notchEventsCaption, l10n.language))
+        }
+    }
+}
+
+private struct SanityNotchEventToggle: View {
+    let event: NotchSanityEvent
+    let title: String
+    @AppStorage private var isOn: Bool
+
+    init(event: NotchSanityEvent, title: String) {
+        self.event = event
+        self.title = title
+        _isOn = AppStorage(wrappedValue: event.enabledByDefault, event.defaultsKey)
+    }
+
+    var body: some View {
+        Toggle(title, isOn: $isOn)
+    }
 }

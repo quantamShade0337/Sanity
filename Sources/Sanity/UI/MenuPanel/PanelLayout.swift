@@ -151,6 +151,23 @@ enum PanelLayout {
         defaults.removeObject(forKey: key)
     }
 
+    /// The sections the one-click Simple Panel keeps: sound, Keep Awake and
+    /// the system glance, matching the focused menu bar described in the
+    /// architecture notes. Everything else stays reachable in the main window
+    /// and can be switched back on in the editor above.
+    static let simplePresetSections: Set<PanelSectionID> = [.mixer, .keepAwake, .system]
+
+    static func applySimplePreset() {
+        for id in PanelSectionID.allCases {
+            setShown(simplePresetSections.contains(id), for: id)
+        }
+        NotificationCenter.default.post(name: visibilityPresetApplied, object: nil)
+    }
+
+    /// Posted after a preset rewrites several visibility keys at once, so
+    /// editors that cache visibility can refresh.
+    static let visibilityPresetApplied = Notification.Name("PanelLayoutVisibilityPresetApplied")
+
     static func isShown(_ id: PanelSectionID) -> Bool {
         defaults.object(forKey: id.visibilityKey) as? Bool ?? id.shownByDefault
     }

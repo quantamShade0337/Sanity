@@ -73,6 +73,7 @@ struct SettingsView: View {
             GeometryReader { geometry in
                 VStack(spacing: 0) {
                     pageHeader
+                    PagePermissionBanner(page: router.page)
                     detail
                         .settingsSectionFocus(for: router.page)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -184,14 +185,13 @@ struct SettingsView: View {
                 Button {
                     showAllPages.toggle()
                 } label: {
-                    Label(showAllPages ? "Show fewer pages" : "Show all pages (\(hidden) more)",
+                    Label(showAllPages ? GuideText.t(.showFewerPages, l10n.language)
+                                       : GuideText.f(.showAllPages, "\(hidden)", language: l10n.language),
                           systemImage: showAllPages ? "chevron.up.circle" : "ellipsis.circle")
                         .foregroundStyle(Color.accentColor)
                 }
                 .buttonStyle(.plain)
-                .help(showAllPages
-                      ? "Only list the pages most people use. Search still finds every page."
-                      : "List every settings page, including advanced tools.")
+                .help(GuideText.t(showAllPages ? .showFewerHelp : .showAllHelp, l10n.language))
             }
         }
     }
@@ -199,7 +199,7 @@ struct SettingsView: View {
     /// Title, icon and a one-sentence explanation of the open page.
     @ViewBuilder
     private var pageHeader: some View {
-        if let summary = SettingsPageGuide.summary(for: router.page),
+        if let summary = SettingsPageGuide.summary(for: router.page, language: l10n.language),
            let item = sidebarSections.flatMap(\.items).first(where: { $0.page == router.page }) {
             SettingsPageHeader(title: item.title, icon: item.icon, summary: summary)
         }
@@ -498,6 +498,15 @@ struct GeneralSettings: View {
                 Text(l10n.s.monitorOrderHint)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                HStack(alignment: .firstTextBaseline, spacing: 12) {
+                    Button(GuideText.t(.simplePanel, l10n.language)) {
+                        PanelLayout.applySimplePreset()
+                    }
+                    Text(GuideText.t(.simplePanelHelp, l10n.language))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             .settingsSectionAnchor(.panelConfiguration)
             if AppFeature.keepAwake.isAvailable {

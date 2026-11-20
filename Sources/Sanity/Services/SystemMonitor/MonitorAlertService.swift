@@ -195,6 +195,7 @@ final class MonitorAlertService {
         }
         lastSent[kind] = now
         Notifier.post(title: title, body: body)
+        MonitorAlertHistory.shared.record(title: title, body: body, at: now)
     }
 }
 

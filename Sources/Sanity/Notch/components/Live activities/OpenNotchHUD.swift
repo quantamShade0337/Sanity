@@ -38,8 +38,8 @@ struct OpenNotchHUD: View {
                     Image(systemName: "mic")
                         .symbolVariant(value > 0 ? .none : .slash)
                         .contentTransition(.interpolate)
-                case .keepAwake:
-                    Image(systemName: value > 0 ? "cup.and.heat.waves.fill" : "cup.and.saucer")
+                case .event:
+                    Image(systemName: icon.isEmpty ? "sparkles" : icon)
                         .contentTransition(.interpolate)
                 default:
                     EmptyView()
@@ -50,13 +50,13 @@ struct OpenNotchHUD: View {
             .frame(width: 20, alignment: .center)
             
             // Slider or Status Text
-            if type != .mic && type != .keepAwake {
+            if type != .mic && type != .event {
                 DraggableProgressBar(value: $value, onChange: { newVal in
                      updateSystemValue(newVal)
                 })
                 .frame(width: showPercentage ? 65 : 108) // Fixed width for consistency
             } else {
-                Text(type == .keepAwake ? (value > 0 ? "Awake" : "Off") : (value > 0 ? "Unmuted" : "Muted"))
+                Text(type == .event ? BoringViewCoordinator.shared.sneakPeek.label : (value > 0 ? "Unmuted" : "Muted"))
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(.white)
                     .fixedSize()

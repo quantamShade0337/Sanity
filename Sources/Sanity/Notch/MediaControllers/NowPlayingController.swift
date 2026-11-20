@@ -66,6 +66,7 @@ final class NowPlayingController: ObservableObject, MediaControllerProtocol {
     private let MRMediaRemoteSetRepeatModeFunction: @convention(c) (Int) -> Void
 
     private var process: Process?
+    private var terminationObserver: NSObjectProtocol?
     private var pipeHandler: JSONLinesPipeHandler?
     private var streamTask: Task<Void, Never>?
 
@@ -100,6 +101,9 @@ final class NowPlayingController: ObservableObject, MediaControllerProtocol {
     }
 
     deinit {
+        if let terminationObserver {
+            NotificationCenter.default.removeObserver(terminationObserver)
+        }
         streamTask?.cancel()
         
         if let pipeHandler = self.pipeHandler {
@@ -205,6 +209,14 @@ final class NowPlayingController: ObservableObject, MediaControllerProtocol {
         
         self.process = process
         self.pipeHandler = pipeHandler
+
+        // deinit never runs when the app quits, so stop the helper here too.
+        // Otherwise each quit leaves a perl process streaming to nobody.
+        terminationObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.willTerminateNotification, object: nil, queue: nil
+        ) { _ in
+            if process.isRunning { process.terminate() }
+        }
 
         do {
             try process.run()

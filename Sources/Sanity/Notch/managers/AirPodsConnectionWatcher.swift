@@ -2,6 +2,7 @@
 // Copyright (C) 2026 Ethan Soh
 
 import CoreAudio
+import CoreBluetooth
 import Foundation
 import IOBluetooth
 
@@ -37,8 +38,7 @@ final class AirPodsConnectionWatcher: NSObject {
 
     func start() {
         startedAt = Date()
-        connectNotification = IOBluetoothDevice.register(
-            forConnectNotifications: self, selector: #selector(bluetoothDeviceConnected(_:device:)))
+        startBluetoothIfAllowed()
 
         knownAudioDevices = Self.audioDeviceNames()
         let block: AudioObjectPropertyListenerBlock = { [weak self] _, _ in
@@ -49,6 +49,16 @@ final class AirPodsConnectionWatcher: NSObject {
                                                &address, DispatchQueue.main, block) == noErr {
             devicesListener = block
         }
+    }
+
+    /// Bluetooth notifications only once Sanity already has Bluetooth access.
+    /// Registering without it makes macOS ask for access on launch and blocks
+    /// the main thread until the person answers, freezing a first launch.
+    /// Until then the audio-device listener still catches AirPods connecting.
+    private func startBluetoothIfAllowed() {
+        guard connectNotification == nil, CBManager.authorization == .allowedAlways else { return }
+        connectNotification = IOBluetoothDevice.register(
+            forConnectNotifications: self, selector: #selector(bluetoothDeviceConnected(_:device:)))
     }
 
     func stop() {
@@ -80,6 +90,7 @@ final class AirPodsConnectionWatcher: NSObject {
     }
 
     private func audioDevicesChanged() {
+        startBluetoothIfAllowed()  // picks up access granted since launch
         let current = Self.audioDeviceNames()
         let added = current.subtracting(knownAudioDevices)
         knownAudioDevices = current

@@ -376,7 +376,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -euo pipefail\nAPP_CONTENTS=\"${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}\"\nFRAMEWORKS_DIR=\"${APP_CONTENTS}/Frameworks\"\nRESOURCE_DIR=\"${APP_CONTENTS}/Resources\"\nNOTCH_MEDIA_DIR=\"${PROJECT_DIR}/../boring.notch-main/mediaremote-adapter\"\nmkdir -p \"${FRAMEWORKS_DIR}\" \"${RESOURCE_DIR}\"\nrm -rf \"${FRAMEWORKS_DIR}/MediaRemoteAdapter.framework\"\nditto \"${NOTCH_MEDIA_DIR}/MediaRemoteAdapter.framework\" \"${FRAMEWORKS_DIR}/MediaRemoteAdapter.framework\"\ncp \"${NOTCH_MEDIA_DIR}/MediaRemoteAdapterTestClient\" \"${RESOURCE_DIR}/MediaRemoteAdapterTestClient\"\ncp \"${NOTCH_MEDIA_DIR}/mediaremote-adapter.pl\" \"${RESOURCE_DIR}/mediaremote-adapter.pl\"\nchmod +x \"${RESOURCE_DIR}/MediaRemoteAdapterTestClient\" \"${RESOURCE_DIR}/mediaremote-adapter.pl\"\n";
+			shellScript = "set -euo pipefail\nAPP_CONTENTS=\"${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}\"\nFRAMEWORKS_DIR=\"${APP_CONTENTS}/Frameworks\"\nRESOURCE_DIR=\"${APP_CONTENTS}/Resources\"\nNOTCH_MEDIA_DIR=\"${PROJECT_DIR}/Support/MediaRemoteAdapter\"\nmkdir -p \"${FRAMEWORKS_DIR}\" \"${RESOURCE_DIR}\"\nrm -rf \"${FRAMEWORKS_DIR}/MediaRemoteAdapter.framework\"\nditto \"${NOTCH_MEDIA_DIR}/MediaRemoteAdapter.framework\" \"${FRAMEWORKS_DIR}/MediaRemoteAdapter.framework\"\ncp \"${NOTCH_MEDIA_DIR}/MediaRemoteAdapterTestClient\" \"${RESOURCE_DIR}/MediaRemoteAdapterTestClient\"\ncp \"${NOTCH_MEDIA_DIR}/mediaremote-adapter.pl\" \"${RESOURCE_DIR}/mediaremote-adapter.pl\"\nchmod +x \"${RESOURCE_DIR}/MediaRemoteAdapterTestClient\" \"${RESOURCE_DIR}/mediaremote-adapter.pl\"\n";
 		};
 		DF74228B69B4282ECB3AD2A5 /* Build bundled helpers */ = {
 			isa = PBXShellScriptBuildPhase;

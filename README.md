@@ -21,6 +21,15 @@ adds a Dynamic Island to the notch, and gathers everyday tools in one place.
 
 macOS 14 Sonoma or later. The Dynamic Island needs a Mac with a notch.
 
+## Installing
+
+Download `Sanity-<version>.dmg` from
+[Releases](https://github.com/quantamShade0337/Sanity/releases) and drag
+Sanity to Applications. Sanity isn't notarized by Apple, so the first time
+you open it macOS says it can't verify it. Click **Done**, open **System
+Settings → Privacy & Security**, and click **Open Anyway** next to Sanity.
+You only do this once.
+
 ## Building from source
 
 Sanity builds with Xcode 26.
@@ -56,7 +65,8 @@ it:
 
 Sanity has no account, analytics or server of its own. It only goes online
 for features you use: lyrics (lrclib.net), Homebrew data (formulae.brew.sh),
-and the network speed test (speed.cloudflare.com). Automatic updates are off until Sanity has its own signed release feed.
+and the network speed test (speed.cloudflare.com). Automatic updates are
+off. New versions come from the Releases page.
 
 Feedback opens a public GitHub issue, so you see everything before it is
 sent.

@@ -4,7 +4,14 @@
 import Foundation
 
 enum FanControlIdentifiers {
-    static let teamID = "3D485NHW29"
+    /// The Apple Developer Team ID that signs both the app and the root fan
+    /// helper. The helper only talks to an app signed by this team, so fan
+    /// control needs a Developer ID release. `nil` (an ad-hoc build) leaves
+    /// the feature unavailable, and the requirements below then match no
+    /// signature at all.
+    static let teamID: String? = nil
+    static var isConfigured: Bool { teamID != nil }
+    private static var requiredTeam: String { teamID ?? "UNCONFIGURED" }
 
     #if VORSSAINT_DEVELOPMENT
     static let appBundleID = "com.ethansoh.Sanity.dev"
@@ -16,9 +23,9 @@ enum FanControlIdentifiers {
     static let plistName = "\(helperID).plist"
 
     static let appCodeRequirement =
-        "anchor apple generic and certificate leaf[subject.OU] = \"\(teamID)\" and identifier \"\(appBundleID)\""
+        "anchor apple generic and certificate leaf[subject.OU] = \"\(requiredTeam)\" and identifier \"\(appBundleID)\""
     static let helperCodeRequirement =
-        "anchor apple generic and certificate leaf[subject.OU] = \"\(teamID)\" and identifier \"\(helperID)\""
+        "anchor apple generic and certificate leaf[subject.OU] = \"\(requiredTeam)\" and identifier \"\(helperID)\""
 }
 
 @objc protocol FanControlXPCProtocol {

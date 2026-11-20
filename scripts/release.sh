@@ -1,14 +1,19 @@
 #!/bin/bash
-# Build a signed, notarized Sanity.dmg ready to share.
+# Build Sanity-<version>.dmg ready to share.
 #
-# Needs (see Documentation/RELEASING.md):
-#   - a "Developer ID Application" certificate in your keychain
-#   - a notarytool keychain profile:  xcrun notarytool store-credentials sanity-notary ...
+# No Apple Developer account needed. Without a "Developer ID Application"
+# certificate the app is ad-hoc signed: it runs on any Mac, but the first
+# time someone opens it macOS asks them to allow it in
+# System Settings > Privacy & Security (see Documentation/RELEASING.md).
+#
+# With a Developer ID certificate in your keychain it signs with that
+# instead and notarizes, so macOS opens it without asking.
 #
 # Usage:
-#   scripts/release.sh                 # uses the notary profile "sanity-notary"
+#   scripts/release.sh                 # ad-hoc, or Developer ID if you have one
+#   ADHOC=1 scripts/release.sh         # force ad-hoc even with a certificate
 #   NOTARY_PROFILE=other scripts/release.sh
-#   SKIP_NOTARIZE=1 scripts/release.sh # signed but not notarized, for a quick local test
+#   SKIP_NOTARIZE=1 scripts/release.sh # Developer ID signed, not notarized
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -21,17 +26,50 @@ NOTARY_PROFILE="${NOTARY_PROFILE:-sanity-notary}"
 say() { printf '\n==> %s\n' "$*"; }
 fail() { printf '\nerror: %s\n' "$*" >&2; exit 1; }
 
-IDENTITY_LINE=$(security find-identity -v -p codesigning | grep "Developer ID Application" | head -1 || true)
-[ -n "$IDENTITY_LINE" ] || fail "No \"Developer ID Application\" certificate found.
-  Apple Development certificates can only run on your own Macs.
-  Create one at https://developer.apple.com/account/resources/certificates (paid Apple Developer Program)."
-TEAM_ID=$(sed -E 's/.*\(([A-Z0-9]{10})\)".*/\1/' <<<"$IDENTITY_LINE")
-say "Signing as team $TEAM_ID"
+IDENTITY_LINE=""
+if [ "${ADHOC:-0}" != "1" ]; then
+    IDENTITY_LINE=$(security find-identity -v -p codesigning | grep "Developer ID Application" | head -1 || true)
+fi
 
-VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" Sources/Info.plist)
+# Info.plist says $(MARKETING_VERSION); the real number is a build setting.
+VERSION=$(xcodebuild -project Sanity.xcodeproj -scheme Sanity -configuration Release \
+    -showBuildSettings 2>/dev/null | awk -F' = ' '/ MARKETING_VERSION = / { print $2; exit }')
+[ -n "$VERSION" ] || fail "Couldn't read MARKETING_VERSION from the project."
 DMG="$OUT/Sanity-$VERSION.dmg"
 rm -rf "$OUT"
 mkdir -p "$OUT"
+
+make_dmg() {
+    local app="$1"
+    say "Building $DMG"
+    local stage="$OUT/dmg"
+    mkdir -p "$stage"
+    cp -R "$app" "$stage/"
+    ln -s /Applications "$stage/Applications"
+    hdiutil create -volname "Sanity" -srcfolder "$stage" -ov -format UDZO "$DMG" >/dev/null
+}
+
+if [ -z "$IDENTITY_LINE" ]; then
+    say "Archiving Sanity $VERSION (Release, ad-hoc signed)"
+    # Hardened runtime is only needed for notarization, and it would refuse
+    # to load the ad-hoc signed frameworks inside the app.
+    xcodebuild -project Sanity.xcodeproj -scheme Sanity -configuration Release \
+        -archivePath "$ARCHIVE" -destination 'generic/platform=macOS' \
+        CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= \
+        ENABLE_HARDENED_RUNTIME=NO -quiet archive
+    APP="$ARCHIVE/Products/Applications/Sanity.app"
+    [ -d "$APP" ] || fail "Archive failed; see the xcodebuild output above."
+    # Re-sign the whole bundle so its resources are sealed. A linker-only
+    # signature makes a downloaded copy look "damaged" to Gatekeeper.
+    codesign --force --deep --sign - "$APP"
+    codesign --verify --deep --strict "$APP"
+    make_dmg "$APP"
+    say "Done: $DMG (ad-hoc signed, not notarized)"
+    exit 0
+fi
+
+TEAM_ID=$(sed -E 's/.*\(([A-Z0-9]{10})\)".*/\1/' <<<"$IDENTITY_LINE")
+say "Signing as team $TEAM_ID"
 
 say "Archiving Sanity $VERSION (Release)"
 xcodebuild -project Sanity.xcodeproj -scheme Sanity -configuration Release \
@@ -56,12 +94,7 @@ xcodebuild -exportArchive -archivePath "$ARCHIVE" -exportPath "$EXPORT" \
 APP="$EXPORT/Sanity.app"
 codesign --verify --deep --strict "$APP"
 
-say "Building $DMG"
-STAGE="$OUT/dmg"
-mkdir -p "$STAGE"
-cp -R "$APP" "$STAGE/"
-ln -s /Applications "$STAGE/Applications"
-hdiutil create -volname "Sanity" -srcfolder "$STAGE" -ov -format UDZO "$DMG" >/dev/null
+make_dmg "$APP"
 codesign --sign "Developer ID Application" --timestamp "$DMG"
 
 if [ "${SKIP_NOTARIZE:-0}" = "1" ]; then

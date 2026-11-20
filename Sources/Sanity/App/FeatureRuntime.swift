@@ -277,6 +277,9 @@ extension AppFeature {
     var hardwareUnsupportedReason: String? {
         switch self {
         case .fanControl:
+            guard FanControlIdentifiers.isConfigured else {
+                return FeatureStrings.fanControl(L10n.shared.language).unsupported
+            }
             return FanControlHardware.hasControllableFan
                 ? nil : FeatureStrings.fanControl(L10n.shared.language).noFans
         default:

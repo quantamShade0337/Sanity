@@ -21,6 +21,9 @@ enum SneakContentType {
     /// A Sanity event (Keep Awake, copied, screenshot saved, output changed):
     /// shown with `sneakPeek.icon` and `sneakPeek.label`, no slider.
     case event
+    /// AirPods or Beats became the output: model glyph in `icon`, the
+    /// lower earbud's charge in `value` (negative when unknown).
+    case airpods
 }
 
 struct sneakPeek {
@@ -214,7 +217,7 @@ class BoringViewCoordinator: ObservableObject {
         icon: String = "", label: String = ""
     ) {
         sneakPeekDuration = duration
-        if type != .music && type != .event {
+        if type != .music && type != .event && type != .airpods {
             // close()
             if !Defaults[.hudReplacement] {
                 return

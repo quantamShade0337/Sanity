@@ -200,11 +200,41 @@ final class NotchIntegration {
         guard device != 0, device != lastOutputDevice else { return }
         lastOutputDevice = device
         guard let name = Self.deviceName(device) else { return }
+        if AirPodsStatus.looksLikeAirPods(name) {
+            showAirPods(outputName: name)
+            return
+        }
         let lower = name.lowercased()
         let icon = lower.contains("airpods") ? "airpods"
             : (lower.contains("headphone") || lower.contains("buds")) ? "headphones"
             : lower.contains("display") || lower.contains("tv") ? "tv"
             : "hifispeaker.fill"
         show(.output, icon: icon, text: name)
+    }
+
+    /// The iPhone "AirPods connected" island: the model's glyph and a battery
+    /// ring, no name. macOS can take a moment to report a fresh connection's
+    /// battery, so one retry follows before showing the glyph alone.
+    private func showAirPods(outputName: String) {
+        guard NotchSanityEvent.output.isEnabled() else { return }
+        Task.detached(priority: .userInitiated) {
+            var status = AirPodsStatus.read(outputName: outputName)
+            if status?.battery == nil {
+                try? await Task.sleep(for: .seconds(1.5))
+                status = AirPodsStatus.read(outputName: outputName) ?? status
+            }
+            let glyph = status?.glyph ?? AirPodsStatus.glyph(productID: nil, name: outputName)
+            let battery = status?.battery
+            await MainActor.run {
+                Self.presentAirPods(glyph: glyph, battery: battery)
+            }
+        }
+    }
+
+    /// Shows the AirPods island. Also used by tests to exercise the layout.
+    static func presentAirPods(glyph: String, battery: Double?) {
+        BoringViewCoordinator.shared.toggleSneakPeek(
+            status: true, type: .airpods, duration: 2.5,
+            value: CGFloat(battery ?? -1), icon: glyph)
     }
 }

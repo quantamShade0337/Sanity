@@ -103,6 +103,14 @@ presentation, through one view (`IslandCompact`):
   between alerts. The battery alert uses the same geometry.
 - White on black only. "Off" states dim to 55%. No glow, no gradients, no
   accent tints, no words like "Volume" beside the glyph.
+- **AirPods and Beats** use the iPhone's "connected" island: the exact model's
+  glyph (AirPods, AirPods 3rd gen+, AirPods Pro, AirPods Max, chosen from the
+  Bluetooth product ID) and a battery ring for the lower earbud, green or red
+  at 20% or below. No name, no number.
+- **Motion:** the island widens first; content fades itself in after 0.24 s
+  so nothing is clipped at the edges. A different alert replaces the content
+  (old out, new in); the same alert updating keeps its view so bars glide.
+  Content fades out before the island shrinks. Reduce Motion skips the delay.
 - Volume, brightness, keyboard backlight, mic and Sanity's own events all use
   this layout. Music keeps its compact live activity (artwork left, waveform
   right), which already follows the same pattern.

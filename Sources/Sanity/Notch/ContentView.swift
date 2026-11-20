@@ -243,7 +243,15 @@ struct NotchContentView: View {
     }
 
     /// Alert types shown in the compact island.
-    static let compactTypes: Set<SneakContentType> = [.volume, .brightness, .backlight, .mic, .event]
+    static let compactTypes: Set<SneakContentType> = [.volume, .brightness, .backlight, .mic, .event, .airpods]
+
+    private var compactIdentity: String {
+        let peek = coordinator.sneakPeek
+        switch peek.type {
+        case .event, .airpods: return "\(peek.type)-\(peek.icon)-\(peek.label)"
+        default: return "\(peek.type)"
+        }
+    }
 
     private var compactTrailing: IslandCompact.Trailing {
         let peek = coordinator.sneakPeek
@@ -252,6 +260,8 @@ struct NotchContentView: View {
             return .text(GuideText.t(peek.value > 0 ? .on : .evOff))
         case .event:
             return .text(peek.label)
+        case .airpods:
+            return peek.value >= 0 ? .batteryRing(Double(peek.value)) : .none
         default:
             return .level(Double(peek.value), showsPercentage: Defaults[.showClosedNotchHUDPercentage])
         }
@@ -312,10 +322,20 @@ struct NotchContentView: View {
                                                                   value: coordinator.sneakPeek.value,
                                                                   override: coordinator.sneakPeek.icon),
                                         trailing: compactTrailing,
-                                        isActive: coordinator.sneakPeek.value > 0,
+                                        isActive: coordinator.sneakPeek.type == .airpods || coordinator.sneakPeek.value > 0,
                                         notchWidth: vm.closedNotchSize.width,
                                         height: vm.effectiveClosedNotchHeight)
-                              .transition(.opacity)
+                              // As on iPhone: the island widens first and the
+                              // content fades in once there is room for it; on
+                              // the way out the content leaves before the island
+                              // shrinks, so nothing is clipped at the edges.
+                              // A different alert is new content (old out, new
+                              // in); the same alert updating, like volume going
+                              // up, stays one view so its bar glides.
+                              .id(compactIdentity)
+                              .transition(.asymmetric(
+                                  insertion: .identity,
+                                  removal: .opacity.animation(.easeIn(duration: 0.08))))
                       } else if (!coordinator.expandingView.show || coordinator.expandingView.type == .music) && vm.notchState == .closed && (musicManager.isPlaying || !musicManager.isPlayerIdle) && coordinator.musicLiveActivityEnabled && !vm.hideOnClosed {
                           MusicLiveActivity()
                               .frame(alignment: .center)

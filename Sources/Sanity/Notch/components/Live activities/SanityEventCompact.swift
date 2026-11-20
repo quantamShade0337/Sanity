@@ -16,6 +16,11 @@ struct IslandCompact: View {
         /// A level from 0 to 1 (volume, brightness), as a short bar, or as
         /// a percentage when the person prefers numbers.
         case level(Double, showsPercentage: Bool)
+        /// A battery charge from 0 to 1 as a ring, like AirPods connecting
+        /// on iPhone: green, red at 20% or below, no number.
+        case batteryRing(Double)
+        /// Glyph only (for example AirPods before macOS reports a charge).
+        case none
     }
 
     let icon: String
@@ -31,6 +36,13 @@ struct IslandCompact: View {
     static let edgeInset: CGFloat = 14
 
     private var ink: Color { isActive ? .white : .white.opacity(0.55) }
+
+    /// The content fades itself in once the island has (nearly) finished
+    /// widening, however the island was opened. Done here rather than as a
+    /// transition because opening from closed rebuilds the surrounding
+    /// layout, which skips transitions on this view.
+    @State private var revealed = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(spacing: 0) {
@@ -51,6 +63,12 @@ struct IslandCompact: View {
                 .padding(.trailing, Self.edgeInset)
         }
         .frame(height: height)
+        .opacity(revealed ? 1 : 0)
+        .onAppear {
+            withAnimation(reduceMotion ? nil : .easeOut(duration: 0.18).delay(0.24)) {
+                revealed = true
+            }
+        }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityText)
     }
@@ -74,13 +92,19 @@ struct IslandCompact: View {
                 IslandLevelBar(value: value)
                     .frame(width: 44, height: 5)
             }
+        case .batteryRing(let charge):
+            IslandBatteryRing(charge: charge)
+                .frame(width: 18, height: 18)
+        case .none:
+            Color.clear
         }
     }
 
     private var accessibilityText: String {
         switch trailing {
         case .text(let label): return label
-        case .level(let value, _): return "\(Int((value * 100).rounded()))%"
+        case .level(let value, _), .batteryRing(let value): return "\(Int((value * 100).rounded()))%"
+        case .none: return ""
         }
     }
 }
@@ -100,6 +124,26 @@ private struct IslandLevelBar: View {
             }
         }
         .animation(.smooth(duration: 0.18), value: value)
+    }
+}
+
+/// The iPhone's AirPods battery ring: a thick stroke on a faint track,
+/// green when charged, red at 20% or below.
+private struct IslandBatteryRing: View {
+    let charge: Double
+
+    var body: some View {
+        let level = min(1, max(0, charge))
+        ZStack {
+            Circle().stroke(Color.white.opacity(0.18), lineWidth: 3)
+            Circle()
+                .trim(from: 0, to: level)
+                .stroke(level <= 0.2 ? Color.red : Color.green,
+                        style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+        }
+        .padding(1.5)
+        .animation(.smooth(duration: 0.4), value: level)
     }
 }
 

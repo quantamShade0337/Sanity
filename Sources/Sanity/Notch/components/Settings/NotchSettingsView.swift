@@ -47,14 +47,11 @@ struct NotchSettingsView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 14) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("Notch")
-                        .font(.title2.weight(.semibold))
-                    Text(GuideText.t(.notchSubtitle))
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                }
+            HStack(alignment: .center, spacing: 14) {
+                Text(GuideText.t(.notchSubtitle))
+                    .font(.system(size: 13))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
                 Spacer()
                 Picker("Section", selection: $selectedSection) {
                     ForEach(Section.allCases) { section in

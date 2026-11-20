@@ -54,33 +54,9 @@ final class SettingsPageGuideTests: XCTestCase {
         XCTAssertEqual(keys.count, Set(keys).count)
     }
 
-    func testCorePagesIncludeTheEssentials() {
-        for page: SettingsPage in [.dashboard, .general, .features, .shortcuts] {
-            XCTAssertTrue(SettingsPageGuide.corePages.contains(page))
-        }
-        XCTAssertLessThan(SettingsPageGuide.corePages.count, SettingsPage.allCases.count / 2 + 1,
-                          "Simple mode should hide most pages")
-    }
-
     func testDashboardIsAlwaysVisible() {
         XCTAssertTrue(FeatureVisibilitySupport.features(for: .dashboard).isEmpty)
         XCTAssertTrue(FeatureVisibilitySupport.isPageVisible(.dashboard) { _ in false })
-    }
-}
-
-final class DashboardCardTests: XCTestCase {
-    func testHiddenCardsRoundTrip() {
-        let cards: Set<DashboardCard> = [.activity, .alerts, .details]
-        XCTAssertEqual(DashboardCard.decodeHidden(DashboardCard.encodeHidden(cards)), cards)
-    }
-
-    func testDecodingIgnoresUnknownAndEmptyValues() {
-        XCTAssertEqual(DashboardCard.decodeHidden(""), [])
-        XCTAssertEqual(DashboardCard.decodeHidden("vitals,,banana,details"), [.vitals, .details])
-    }
-
-    func testEncodingIsStable() {
-        XCTAssertEqual(DashboardCard.encodeHidden([.processes, .activity]), "activity,processes")
     }
 }
 

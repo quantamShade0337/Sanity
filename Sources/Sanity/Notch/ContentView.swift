@@ -284,6 +284,15 @@ struct NotchContentView: View {
                             .frame(width: 76, alignment: .trailing)
                         }
                         .frame(height: vm.effectiveClosedNotchHeight, alignment: .center)
+                      } else if coordinator.sneakPeek.show && coordinator.sneakPeek.type == .event && vm.notchState == .closed {
+                          // Sanity's own alerts always use the iPhone-style
+                          // compact island, whatever the HUD style setting.
+                          SanityEventCompact(icon: coordinator.sneakPeek.icon,
+                                             label: coordinator.sneakPeek.label,
+                                             isActive: coordinator.sneakPeek.value > 0,
+                                             notchWidth: vm.closedNotchSize.width,
+                                             height: vm.effectiveClosedNotchHeight)
+                              .transition(.opacity)
                       } else if coordinator.sneakPeek.show && Defaults[.inlineHUD] && (coordinator.sneakPeek.type != .music) && (coordinator.sneakPeek.type != .battery) && vm.notchState == .closed {
                           InlineHUD(type: $coordinator.sneakPeek.type, value: $coordinator.sneakPeek.value, icon: $coordinator.sneakPeek.icon, hoverAnimation: $isHovering, gestureProgress: $gestureProgress)
                               .transition(.opacity)
@@ -301,7 +310,7 @@ struct NotchContentView: View {
                        }
 
                       if coordinator.sneakPeek.show {
-                          if (coordinator.sneakPeek.type != .music) && (coordinator.sneakPeek.type != .battery) && !Defaults[.inlineHUD] && vm.notchState == .closed {
+                          if (coordinator.sneakPeek.type != .music) && (coordinator.sneakPeek.type != .battery) && (coordinator.sneakPeek.type != .event) && !Defaults[.inlineHUD] && vm.notchState == .closed {
                               SystemEventIndicatorModifier(
                                   eventType: $coordinator.sneakPeek.type,
                                   value: $coordinator.sneakPeek.value,

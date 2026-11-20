@@ -381,7 +381,7 @@ private struct FeatureHubRow: View {
         HStack(spacing: 10) {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .fill(installed
-                        ? AnyShapeStyle(Theme.spaceGradient)
+                        ? AnyShapeStyle(Color.accentColor)
                         : AnyShapeStyle(Color.secondary.opacity(0.22)))
                 .frame(width: 30, height: 30)
                 .overlay(

@@ -8,6 +8,10 @@ import Foundation
 extension GuideStrings {
     static let dashboardStatus: [AppLanguage: [GuideKey: String]] = [
         .de: [
+            .evOff: "Aus",
+            .evSaved: "Gesichert",
+            .freeOfTotal: "frei von %@",
+            .appColumn: "App",
             .processor: "Prozessor",
             .statusGood: "Dein Mac läuft rund",
             .statusGoodDetail: "Gerade braucht nichts deine Aufmerksamkeit.",
@@ -43,6 +47,10 @@ extension GuideStrings {
             .quitAppShort: "Beenden",
         ],
         .fr: [
+            .evOff: "Désactivé",
+            .evSaved: "Enregistré",
+            .freeOfTotal: "libres sur %@",
+            .appColumn: "App",
             .processor: "Processeur",
             .statusGood: "Votre Mac tourne bien",
             .statusGoodDetail: "Rien ne demande votre attention pour l’instant.",
@@ -78,6 +86,10 @@ extension GuideStrings {
             .quitAppShort: "Quitter",
         ],
         .es: [
+            .evOff: "Desactivado",
+            .evSaved: "Guardado",
+            .freeOfTotal: "libres de %@",
+            .appColumn: "App",
             .processor: "Procesador",
             .statusGood: "Tu Mac funciona bien",
             .statusGoodDetail: "Ahora mismo nada necesita tu atención.",
@@ -113,6 +125,10 @@ extension GuideStrings {
             .quitAppShort: "Salir",
         ],
         .it: [
+            .evOff: "Spento",
+            .evSaved: "Salvato",
+            .freeOfTotal: "liberi su %@",
+            .appColumn: "App",
             .processor: "Processore",
             .statusGood: "Il tuo Mac funziona bene",
             .statusGoodDetail: "Al momento niente richiede la tua attenzione.",
@@ -148,6 +164,10 @@ extension GuideStrings {
             .quitAppShort: "Esci",
         ],
         .ptBR: [
+            .evOff: "Desligado",
+            .evSaved: "Salvo",
+            .freeOfTotal: "livres de %@",
+            .appColumn: "App",
             .processor: "Processador",
             .statusGood: "Seu Mac está funcionando bem",
             .statusGoodDetail: "Nada precisa da sua atenção agora.",
@@ -183,6 +203,10 @@ extension GuideStrings {
             .quitAppShort: "Encerrar",
         ],
         .tr: [
+            .evOff: "Kapalı",
+            .evSaved: "Kaydedildi",
+            .freeOfTotal: "boş / %@",
+            .appColumn: "Uygulama",
             .processor: "İşlemci",
             .statusGood: "Mac'in sorunsuz çalışıyor",
             .statusGoodDetail: "Şu anda ilgilenmen gereken bir şey yok.",
@@ -218,6 +242,10 @@ extension GuideStrings {
             .quitAppShort: "Çık",
         ],
         .ru: [
+            .evOff: "Выкл.",
+            .evSaved: "Сохранено",
+            .freeOfTotal: "свободно из %@",
+            .appColumn: "Приложение",
             .processor: "Процессор",
             .statusGood: "Mac работает нормально",
             .statusGoodDetail: "Сейчас ничего не требует вашего внимания.",
@@ -253,6 +281,10 @@ extension GuideStrings {
             .quitAppShort: "Завершить",
         ],
         .ja: [
+            .evOff: "オフ",
+            .evSaved: "保存済み",
+            .freeOfTotal: "空き / %@",
+            .appColumn: "App",
             .processor: "プロセッサ",
             .statusGood: "Macは快調です",
             .statusGoodDetail: "今のところ対応が必要なことはありません。",
@@ -288,6 +320,10 @@ extension GuideStrings {
             .quitAppShort: "終了",
         ],
         .ko: [
+            .evOff: "끔",
+            .evSaved: "저장됨",
+            .freeOfTotal: "사용 가능 / %@",
+            .appColumn: "앱",
             .processor: "프로세서",
             .statusGood: "Mac이 잘 작동하고 있습니다",
             .statusGoodDetail: "지금은 신경 쓸 일이 없습니다.",
@@ -323,6 +359,10 @@ extension GuideStrings {
             .quitAppShort: "종료",
         ],
         .zhHans: [
+            .evOff: "关闭",
+            .evSaved: "已存储",
+            .freeOfTotal: "可用，共 %@",
+            .appColumn: "App",
             .processor: "处理器",
             .statusGood: "你的 Mac 运行顺畅",
             .statusGoodDetail: "目前没有需要你处理的事情。",
@@ -358,6 +398,10 @@ extension GuideStrings {
             .quitAppShort: "退出",
         ],
         .zhTW: [
+            .evOff: "關閉",
+            .evSaved: "已儲存",
+            .freeOfTotal: "可用，共 %@",
+            .appColumn: "App",
             .processor: "處理器",
             .statusGood: "你的 Mac 運作順暢",
             .statusGoodDetail: "目前沒有需要你處理的事情。",

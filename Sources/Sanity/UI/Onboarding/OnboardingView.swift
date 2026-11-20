@@ -140,35 +140,28 @@ struct OnboardingView: View {
 private struct WelcomeStep: View {
     @ObservedObject private var l10n = L10n.shared
 
+    /// Apple's welcome-sheet pattern: the app's own icon, a plain title, a
+    /// few features with accent symbols, then the one choice to make here.
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                Theme.spaceGradient
-                VStack(spacing: 10) {
-                    BrandMark(width: 130)
-                    Text(AppInfo.name)
-                        .font(.system(size: 26, weight: .bold))
-                        .foregroundStyle(.white)
-                    Text(l10n.s.obStepWelcomeBody)
-                        .font(.system(size: 12))
-                        .foregroundStyle(.white.opacity(0.85))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 40)
-                }
-                .padding(.top, 12)
+        VStack(alignment: .leading, spacing: 0) {
+            VStack(spacing: 10) {
+                Image(nsImage: NSApp.applicationIconImage)
+                    .resizable()
+                    .frame(width: 72, height: 72)
+                    .accessibilityHidden(true)
+                Text(AppInfo.name)
+                    .font(.system(size: 24, weight: .bold))
+                Text(l10n.s.obStepWelcomeBody)
+                    .font(.system(size: 13))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .frame(height: 220)
+            .frame(maxWidth: .infinity)
+            .padding(.top, 36)
+            .padding(.bottom, 28)
 
-            VStack(alignment: .leading, spacing: 16) {
-                Picker(l10n.s.obLanguageLabel, selection: $l10n.language) {
-                    ForEach(AppLanguage.allCases) { language in
-                        Text(language.displayName).tag(language)
-                    }
-                }
-                // A menu (not segmented): with nine languages a segmented control
-                // would overflow, and several names are in their own script.
-                .pickerStyle(.menu)
-
+            VStack(alignment: .leading, spacing: 18) {
                 featureRow(icon: "bolt.fill",
                            title: l10n.s.obWelcomeBullet1Title,
                            text: l10n.s.obWelcomeBullet1Body)
@@ -179,25 +172,40 @@ private struct WelcomeStep: View {
                            title: l10n.s.obWelcomeBullet3Title,
                            text: l10n.s.obWelcomeBullet3Body)
             }
-            .padding(24)
+            .padding(.horizontal, 56)
+
+            Divider()
+                .padding(.horizontal, 56)
+                .padding(.top, 28)
+                .padding(.bottom, 16)
+
+            Picker(l10n.s.obLanguageLabel, selection: $l10n.language) {
+                ForEach(AppLanguage.allCases) { language in
+                    Text(language.displayName).tag(language)
+                }
+            }
+            // A menu (not segmented): with many languages a segmented control
+            // would overflow, and several names are in their own script.
+            .pickerStyle(.menu)
+            .fixedSize()
+            .padding(.horizontal, 56)
+            .padding(.bottom, 24)
         }
     }
 
     private func featureRow(icon: String, title: String, text: String) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(Theme.spaceGradient)
-                    .frame(width: 30, height: 30)
-                Image(systemName: icon)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white)
-            }
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: icon)
+                .font(.system(size: 20))
+                .foregroundStyle(Color.accentColor)
+                .symbolRenderingMode(.hierarchical)
+                .frame(width: 28)
+                .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.system(size: 13, weight: .semibold))
                 Text(text)
-                    .font(.system(size: 11.5))
+                    .font(.system(size: 12))
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -349,7 +357,7 @@ private struct PurposeStep: View {
             HStack(spacing: 10) {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .fill(selected
-                          ? AnyShapeStyle(Theme.spaceGradient)
+                          ? AnyShapeStyle(Color.accentColor)
                           : AnyShapeStyle(Color.secondary.opacity(0.16)))
                     .frame(width: 32, height: 32)
                     .overlay {
@@ -505,35 +513,37 @@ private struct DoneStep: View {
     @ObservedObject private var l10n = L10n.shared
 
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                Theme.spaceGradient
-                VStack(spacing: 14) {
-                    BrandMark(width: 150)
-                    Text(l10n.s.obStepDoneTitle)
-                        .font(.system(size: 26, weight: .bold))
-                        .foregroundStyle(.white)
-                    Text(l10n.s.obStepDoneBody)
-                        .font(.system(size: 12.5))
-                        .foregroundStyle(.white.opacity(0.85))
-                }
-            }
-            .frame(height: 300)
+        VStack(spacing: 10) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 44))
+                .foregroundStyle(PanelMetricColor.green(for: .light))
+                .symbolRenderingMode(.hierarchical)
+                .padding(.bottom, 4)
+                .accessibilityHidden(true)
+            Text(l10n.s.obStepDoneTitle)
+                .font(.system(size: 22, weight: .bold))
+            Text(l10n.s.obStepDoneBody)
+                .font(.system(size: 13))
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
 
-            VStack(spacing: 10) {
+            HStack(alignment: .top, spacing: 12) {
                 Image(systemName: "menubar.arrow.up.rectangle")
-                    .font(.system(size: 26))
+                    .font(.system(size: 18))
                     .foregroundStyle(.secondary)
+                    .accessibilityHidden(true)
                 Text(l10n.s.obDoneHint)
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 60)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(.top, 36)
-
-            Spacer()
+            .padding(.top, 28)
+            .padding(.horizontal, 24)
         }
+        .padding(.horizontal, 48)
+        .padding(.top, 72)
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -546,18 +556,16 @@ private struct StepHeader: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(Theme.spaceGradient)
-                    .frame(width: 56, height: 56)
-                Image(systemName: icon)
-                    .font(.system(size: 24, weight: .semibold))
-                    .foregroundStyle(.white)
-            }
+            Image(systemName: icon)
+                .font(.system(size: 34))
+                .foregroundStyle(Color.accentColor)
+                .symbolRenderingMode(.hierarchical)
+                .frame(height: 40)
+                .accessibilityHidden(true)
             Text(title)
-                .font(.system(size: 19, weight: .bold))
+                .font(.system(size: 22, weight: .bold))
             Text(subtitle)
-                .font(.system(size: 12))
+                .font(.system(size: 13))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)

@@ -13,7 +13,6 @@ struct SettingsView: View {
     @ObservedObject private var features = FeatureRuntime.shared
     @AppStorage(DefaultsKey.superKeySource) private var superKeySourceRaw =
         SuperKeySource.capsLock.rawValue
-    @AppStorage(SettingsPageGuide.showAllPagesKey) private var showAllPages = false
     @State private var searchQuery = ""
     @State private var activeSearchIndex: Int?
     @FocusState private var sidebarSearchFocused: Bool
@@ -72,13 +71,14 @@ struct SettingsView: View {
             // when asked for an unconstrained ideal size, breaking the chain.
             GeometryReader { geometry in
                 VStack(spacing: 0) {
-                    pageHeader
+                    pageIntro
                     PagePermissionBanner(page: router.page)
                     detail
                         .settingsSectionFocus(for: router.page)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
+                .navigationTitle(pageTitle)
             }
         }
         .navigationSplitViewStyle(.balanced)
@@ -148,7 +148,6 @@ struct SettingsView: View {
             ForEach(sidebarSections, id: \.title) { section in
                 let items = section.items.filter {
                     FeatureVisibilitySupport.isPageVisible($0.page) { $0.isAvailable }
-                        && isInSidebarMode($0.page)
                         && SettingsSearchSupport.matches(query: searchQuery, title: $0.title,
                                                          keywords: $0.keywords)
                 }
@@ -160,48 +159,22 @@ struct SettingsView: View {
                     }
                 }
             }
-            showAllPagesRow
         }
         .listStyle(.sidebar)
     }
 
-    /// Simple mode keeps the sidebar to the pages most people need; the page
-    /// currently open always stays listed so navigation never loses its place.
-    private func isInSidebarMode(_ page: SettingsPage) -> Bool {
-        showAllPages || SettingsPageGuide.corePages.contains(page) || page == router.page
+    /// The open page's name, shown in the window's title bar the way
+    /// System Settings does, so the content area needs no heading.
+    private var pageTitle: String {
+        sidebarSections.flatMap(\.items).first(where: { $0.page == router.page })?.title
+            ?? l10n.s.settingsTitle
     }
 
-    private var hiddenPageCount: Int {
-        sidebarSections.flatMap(\.items).filter {
-            FeatureVisibilitySupport.isPageVisible($0.page) { $0.isAvailable } && !isInSidebarMode($0.page)
-        }.count
-    }
-
+    /// One plain sentence about the open page, set on the form's own grid.
     @ViewBuilder
-    private var showAllPagesRow: some View {
-        let hidden = hiddenPageCount
-        if showAllPages || hidden > 0 {
-            Section {
-                Button {
-                    showAllPages.toggle()
-                } label: {
-                    Label(showAllPages ? GuideText.t(.showFewerPages, l10n.language)
-                                       : GuideText.f(.showAllPages, "\(hidden)", language: l10n.language),
-                          systemImage: showAllPages ? "chevron.up.circle" : "ellipsis.circle")
-                        .foregroundStyle(Color.accentColor)
-                }
-                .buttonStyle(.plain)
-                .help(GuideText.t(showAllPages ? .showFewerHelp : .showAllHelp, l10n.language))
-            }
-        }
-    }
-
-    /// Title, icon and a one-sentence explanation of the open page.
-    @ViewBuilder
-    private var pageHeader: some View {
-        if let summary = SettingsPageGuide.summary(for: router.page, language: l10n.language),
-           let item = sidebarSections.flatMap(\.items).first(where: { $0.page == router.page }) {
-            SettingsPageHeader(title: item.title, icon: item.icon, summary: summary)
+    private var pageIntro: some View {
+        if let summary = SettingsPageGuide.summary(for: router.page, language: l10n.language) {
+            SettingsPageIntro(summary: summary)
         }
     }
 

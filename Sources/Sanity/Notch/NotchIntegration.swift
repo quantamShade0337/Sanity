@@ -78,17 +78,16 @@ final class NotchIntegration {
 
     // MARK: - Sanity events
 
-    private func show(_ event: NotchSanityEvent, icon: String, label: GuideKey) {
-        guard event.isEnabled() else { return }
-        BoringViewCoordinator.shared.toggleSneakPeek(
-            status: true, type: .event, duration: 1.8, value: 1,
-            icon: icon, label: GuideText.t(label))
+    /// Shows one compact island alert: a glyph left of the camera and one
+    /// short word right of it, for about as long as iPhone shows Silent mode.
+    private func show(_ event: NotchSanityEvent, icon: String, label: GuideKey, active: Bool = true) {
+        show(event, icon: icon, text: GuideText.t(label), active: active)
     }
 
-    private func show(_ event: NotchSanityEvent, icon: String, text: String) {
+    private func show(_ event: NotchSanityEvent, icon: String, text: String, active: Bool = true) {
         guard event.isEnabled() else { return }
         BoringViewCoordinator.shared.toggleSneakPeek(
-            status: true, type: .event, duration: 1.8, value: 1, icon: icon, label: text)
+            status: true, type: .event, duration: 2.0, value: active ? 1 : 0, icon: icon, label: text)
     }
 
     /// Forwards Sanity's own state changes into the notch HUD. Only real
@@ -102,8 +101,8 @@ final class NotchIntegration {
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] isActive in
                     self?.show(.keepAwake,
-                               icon: isActive ? "cup.and.heat.waves.fill" : "cup.and.saucer",
-                               label: isActive ? .evKeepAwakeOn : .evKeepAwakeOff)
+                               icon: isActive ? "cup.and.heat.waves.fill" : "cup.and.saucer.fill",
+                               label: isActive ? .on : .evOff, active: isActive)
                 }
                 .store(in: &observers)
         }
@@ -133,8 +132,8 @@ final class NotchIntegration {
                 .sink { [weak self] entry in
                     let isRecording = entry.kind == .recording
                     self?.show(.capture,
-                               icon: isRecording ? "record.circle" : "camera.viewfinder",
-                               label: isRecording ? .evRecording : .evScreenshot)
+                               icon: isRecording ? "record.circle.fill" : "camera.viewfinder",
+                               label: .evSaved)
                 }
                 .store(in: &observers)
         }

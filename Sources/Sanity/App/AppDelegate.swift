@@ -1303,6 +1303,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             // The window's size is fully owned by SettingsWindowSupport's
             // explicit sizing below plus ordinary user drag-resize.
             host.sizingOptions = []
+            // The page title set with .navigationTitle names the window, as in
+            // System Settings, so pages need no heading of their own.
+            host.sceneBridgingOptions = [.title]
             let window = NSWindow(contentViewController: host)
             // .miniaturizable so the Window menu's Minimize (Cmd+M) actually works.
             window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
@@ -1329,7 +1332,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
             window.delegate = self
             settingsWindow = window
         }
-        settingsWindow?.title = L10n.shared.s.settingsTitle
         if let window = settingsWindow {
             positionSettingsWindow(window, force: createdWindow)
         }

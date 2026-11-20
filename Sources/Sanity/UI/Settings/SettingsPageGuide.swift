@@ -7,19 +7,8 @@ import SwiftUI
 /// Sanity for the first time: which pages matter most, and one sentence on
 /// what each page is for.
 enum SettingsPageGuide {
-    /// UserDefaults key: false (the default) shows only `corePages` in the
-    /// sidebar, true shows every page.
-    static let showAllPagesKey = "settingsShowAllPages"
     /// UserDefaults key: set once the Dashboard's getting-started card is dismissed.
     static let gettingStartedDismissedKey = "dashboardGettingStartedDismissed"
-
-    /// The pages a new user is most likely to need. Everything else stays one
-    /// click away behind "Show all pages", and is always reachable by search.
-    static let corePages: Set<SettingsPage> = [
-        .dashboard, .general, .features, .notch, .energy, .monitor,
-        .clipboard, .windowLayout, .screenshot, .cleaner, .uninstaller,
-        .shortcuts, .about,
-    ]
 
     static func summary(for page: SettingsPage,
                         language: AppLanguage = L10n.shared.language) -> String? {
@@ -63,36 +52,33 @@ enum SettingsPageGuide {
     }
 }
 
-/// The title and one-line explanation shown above a Settings page.
-struct SettingsPageHeader: View {
-    let title: String
-    let icon: String
+/// Metrics of macOS grouped forms, so text placed above a page's `Form`
+/// lines up with the form's rows instead of floating at its own margin.
+enum GroupedFormMetrics {
+    /// Horizontal margin between the detail pane and the form's sections.
+    static let outerMargin: CGFloat = 20
+    /// Widest a grouped form's sections grow before they centre.
+    static let maxWidth: CGFloat = 704
+    /// Leading inset of row content inside a section.
+    static let rowInset: CGFloat = 10
+}
+
+/// One plain sentence above a Settings page, aligned with the form's rows.
+/// The page title lives in the window title bar, so there is no heading,
+/// no icon tile and nothing that competes with the form itself.
+struct SettingsPageIntro: View {
     let summary: String
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 18, weight: .medium))
-                .foregroundStyle(.white)
-                .frame(width: 34, height: 34)
-                .background(Color.accentColor.gradient,
-                            in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 3) {
-                Text(title)
-                    .font(.title2.weight(.semibold))
-                Text(summary)
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal, 20)
-        .padding(.top, 18)
-        .padding(.bottom, 6)
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(.isHeader)
+        Text(summary)
+            .font(.system(size: 13))
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, GroupedFormMetrics.rowInset)
+            .frame(maxWidth: GroupedFormMetrics.maxWidth, alignment: .leading)
+            .padding(.horizontal, GroupedFormMetrics.outerMargin)
+            .padding(.top, 18)
+            .frame(maxWidth: .infinity)
     }
 }
 
@@ -157,14 +143,14 @@ struct PagePermissionBanner: View {
                         }
                         .controlSize(.small)
                     }
-                    .padding(10)
-                    .background(Color.orange.opacity(0.12),
-                                in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .padding(.horizontal, GroupedFormMetrics.rowInset)
                     .accessibilityElement(children: .combine)
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 6)
+            .frame(maxWidth: GroupedFormMetrics.maxWidth, alignment: .leading)
+            .padding(.horizontal, GroupedFormMetrics.outerMargin)
+            .padding(.top, 12)
+            .frame(maxWidth: .infinity)
         }
     }
 }

@@ -63,11 +63,15 @@ enum SettingsDirectory {
         let categories = FeatureStrings.settingsCategories(language)
         let quitProtection = FeatureStrings.quitProtection(language)
         return [
-            (categories.essentials, [
+            // The Dashboard is the app's home, not a preference page: it sits
+            // alone above the settings groups, with no section label.
+            ("", [
                 SettingsDirectoryItem(page: .dashboard, title: GuideText.t(.dashTitle, language),
                                       icon: "gauge.with.dots.needle.67percent",
                                       keywords: ["CPU", "GPU", "memory", "RAM", "disk", "storage",
                                                  "network", "battery", "processes", "overview", "stats"]),
+            ]),
+            (categories.essentials, [
                 SettingsDirectoryItem(page: .general, title: s.tabGeneral, icon: "gearshape",
                                        keywords: [s.launchAtLogin, s.languageLabel, s.showMenuBarIcon,
                                                   FeatureStrings.appearance(language).label,

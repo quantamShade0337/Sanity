@@ -21,15 +21,32 @@ enum SanityDesign {
     // MARK: Type roles
 
     enum Typography {
-        /// The one sentence a page leads with.
+        /// The one sentence a screen leads with. Exactly one per screen.
+        static let display = Font.system(size: 22, weight: .semibold)
+        /// Kept for screens with a smaller lead line.
         static let lead = Font.system(size: 15, weight: .semibold)
-        /// Section titles inside a page (13 pt semibold, the macOS norm).
+        /// Section labels: small, uppercase, tracked. Sanity's
+        /// instrument-panel voice; never used for anything but labels.
+        static let eyebrow = Font.system(size: 11, weight: .semibold)
+        static let eyebrowTracking: CGFloat = 0.6
+        /// Disclosure and in-page titles that are not eyebrows.
         static let section = Font.system(size: 13, weight: .semibold)
-        /// Headline numbers. Regular weight reads calmer than bold at size.
-        static let metric = Font.system(size: 26, weight: .regular).monospacedDigit()
+        /// Readings use SF Pro Rounded with tabular figures; the unit is set
+        /// smaller and quieter so the number carries the reading.
+        static let metric = Font.system(size: 28, weight: .medium, design: .rounded).monospacedDigit()
+        static let metricUnit = Font.system(size: 14, weight: .medium, design: .rounded)
         static let body = Font.system(size: 13)
         static let secondary = Font.system(size: 12)
         static let caption = Font.system(size: 11)
+    }
+
+    // MARK: Identity
+
+    /// Sanity Indigo: the brand's one colour. Used for the brand mark and
+    /// live data lines only, never for status, never for chrome.
+    static func brand(_ scheme: ColorScheme) -> Color {
+        scheme == .dark ? Color(red: 0.58, green: 0.56, blue: 1.0)
+                        : Color(red: 0.36, green: 0.33, blue: 0.86)
     }
 
     // MARK: Semantic colour
@@ -91,8 +108,11 @@ struct SanitySectionHeader<Accessory: View>: View {
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
-            Text(title)
-                .font(SanityDesign.Typography.section)
+            Text(title.uppercased(with: Locale.current))
+                .font(SanityDesign.Typography.eyebrow)
+                .tracking(SanityDesign.Typography.eyebrowTracking)
+                .foregroundStyle(.secondary)
+                .accessibilityLabel(title)
                 .accessibilityAddTraits(.isHeader)
             Spacer(minLength: SanityDesign.Space.s)
             accessory

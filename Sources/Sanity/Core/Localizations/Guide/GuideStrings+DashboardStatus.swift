@@ -8,6 +8,8 @@ import Foundation
 extension GuideStrings {
     static let dashboardStatus: [AppLanguage: [GuideKey: String]] = [
         .de: [
+            .backgroundProcesses: "Hintergrundprozesse",
+            .percentFull: "%@ belegt",
             .evOff: "Aus",
             .evSaved: "Gesichert",
             .freeOfTotal: "frei von %@",
@@ -47,6 +49,8 @@ extension GuideStrings {
             .quitAppShort: "Beenden",
         ],
         .fr: [
+            .backgroundProcesses: "Processus en arrière-plan",
+            .percentFull: "%@ utilisés",
             .evOff: "Désactivé",
             .evSaved: "Enregistré",
             .freeOfTotal: "libres sur %@",
@@ -86,6 +90,8 @@ extension GuideStrings {
             .quitAppShort: "Quitter",
         ],
         .es: [
+            .backgroundProcesses: "Procesos en segundo plano",
+            .percentFull: "%@ ocupado",
             .evOff: "Desactivado",
             .evSaved: "Guardado",
             .freeOfTotal: "libres de %@",
@@ -125,6 +131,8 @@ extension GuideStrings {
             .quitAppShort: "Salir",
         ],
         .it: [
+            .backgroundProcesses: "Processi in background",
+            .percentFull: "%@ occupato",
             .evOff: "Spento",
             .evSaved: "Salvato",
             .freeOfTotal: "liberi su %@",
@@ -164,6 +172,8 @@ extension GuideStrings {
             .quitAppShort: "Esci",
         ],
         .ptBR: [
+            .backgroundProcesses: "Processos em segundo plano",
+            .percentFull: "%@ ocupado",
             .evOff: "Desligado",
             .evSaved: "Salvo",
             .freeOfTotal: "livres de %@",
@@ -203,6 +213,8 @@ extension GuideStrings {
             .quitAppShort: "Encerrar",
         ],
         .tr: [
+            .backgroundProcesses: "Arka plan işlemleri",
+            .percentFull: "%@ dolu",
             .evOff: "Kapalı",
             .evSaved: "Kaydedildi",
             .freeOfTotal: "boş / %@",
@@ -242,6 +254,8 @@ extension GuideStrings {
             .quitAppShort: "Çık",
         ],
         .ru: [
+            .backgroundProcesses: "Фоновые процессы",
+            .percentFull: "занято %@",
             .evOff: "Выкл.",
             .evSaved: "Сохранено",
             .freeOfTotal: "свободно из %@",
@@ -281,6 +295,8 @@ extension GuideStrings {
             .quitAppShort: "Завершить",
         ],
         .ja: [
+            .backgroundProcesses: "バックグラウンドプロセス",
+            .percentFull: "%@ 使用中",
             .evOff: "オフ",
             .evSaved: "保存済み",
             .freeOfTotal: "空き / %@",
@@ -320,6 +336,8 @@ extension GuideStrings {
             .quitAppShort: "終了",
         ],
         .ko: [
+            .backgroundProcesses: "백그라운드 프로세스",
+            .percentFull: "%@ 사용 중",
             .evOff: "끔",
             .evSaved: "저장됨",
             .freeOfTotal: "사용 가능 / %@",
@@ -359,6 +377,8 @@ extension GuideStrings {
             .quitAppShort: "종료",
         ],
         .zhHans: [
+            .backgroundProcesses: "后台进程",
+            .percentFull: "已用 %@",
             .evOff: "关闭",
             .evSaved: "已存储",
             .freeOfTotal: "可用，共 %@",
@@ -398,6 +418,8 @@ extension GuideStrings {
             .quitAppShort: "退出",
         ],
         .zhTW: [
+            .backgroundProcesses: "背景程序",
+            .percentFull: "已使用 %@",
             .evOff: "關閉",
             .evSaved: "已儲存",
             .freeOfTotal: "可用，共 %@",

@@ -48,12 +48,19 @@ struct DashboardStatus: Equatable {
     }
 }
 
-/// The first page of the Sanity window, laid out like a native inspector:
-/// a one-line verdict, a strip of four readings, the recent activity, the
-/// apps responsible, and the technical details in plain label/value rows.
-/// No cards; whitespace and a few hairlines carry the structure. While the
-/// page is visible it registers as a full monitor surface, so sampling stops
-/// as soon as the person navigates away.
+/// Sanity's home screen and the reference for its design language.
+///
+/// Composition, top to bottom:
+/// 1. Identity line: the Sanity mark, this Mac's name, its uptime.
+/// 2. The verdict: one display-size sentence. The single focal point.
+/// 3. Four readings on one rule-bounded strip. Fast-changing values carry a
+///    short history line in Sanity Indigo; capacities carry a bar showing
+///    what is left, so the bar always agrees with the number above it.
+/// 4. What's using the Mac: apps, with background daemons folded into one row.
+/// 5. Recent alerts (only when there are some) and the technical details.
+///
+/// Separation is hairlines and whitespace only. While visible the page is a
+/// full monitor surface; sampling stops when the person navigates away.
 struct DashboardView: View {
     @ObservedObject private var l10n = L10n.shared
     @ObservedObject private var monitor = SystemMonitor.shared
@@ -63,13 +70,13 @@ struct DashboardView: View {
     @AppStorage(DefaultsKey.temperatureUnit) private var temperatureUnitRaw = TemperatureUnit.celsius.rawValue
     @AppStorage(DefaultsKey.monitorInterval) private var monitorInterval = 2
     @AppStorage(SettingsPageGuide.gettingStartedDismissedKey) private var gettingStartedDismissed = false
-    @AppStorage("dashboardDetailsExpanded") private var detailsExpanded = true
+    @AppStorage("dashboardDetailsExpanded") private var detailsExpanded = false
+    @AppStorage("dashboardProcessSort") private var processSortRaw = "cpu"
     @Environment(\.colorScheme) private var scheme
 
     @State private var topCPU: [ProcessUsage] = []
     @State private var topMemory: [ProcessUsage] = []
     @State private var processesLoaded = false
-    @State private var processKind: BreakdownKind = .cpu
 
     private typealias Space = SanityDesign.Space
     private typealias Typo = SanityDesign.Typography
@@ -77,53 +84,85 @@ struct DashboardView: View {
     private var lang: AppLanguage { l10n.language }
     private func t(_ key: GuideKey) -> String { GuideText.t(key, lang) }
     private var snapshot: SystemSnapshot { monitor.snapshot }
+    private var brand: Color { SanityDesign.brand(scheme) }
+    private var showsCPU: Bool { features.isAvailable(.monitorCPU) }
+    private var showsMemory: Bool { features.isAvailable(.monitorMemory) }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                statusHeader
+                identityLine
                     .padding(.bottom, Space.m)
+                verdict
                 if !gettingStartedDismissed {
-                    SetupStrip(onDismiss: { gettingStartedDismissed = true })
-                        .padding(.bottom, Space.m)
+                    SetupLine(onDismiss: { gettingStartedDismissed = true })
+                        .padding(.top, Space.s)
                 }
-                SanityHairline()
-                vitalsStrip
-                    .padding(.vertical, Space.l)
-                SanityHairline()
-                    .padding(.bottom, Space.xl)
 
-                VStack(alignment: .leading, spacing: 40) {
-                    if features.isAvailable(.monitorCPU) || features.isAvailable(.monitorMemory) {
-                        activitySection
-                    }
-                    if features.isAvailable(.monitorCPU) || features.isAvailable(.monitorMemory) {
-                        processesSection
-                    }
-                    if !alertHistory.entries.isEmpty { alertsSection }
-                    detailsSection
+                readingsStrip
+                    .padding(.top, 28)
+
+                if showsCPU || showsMemory {
+                    processesSection
+                        .padding(.top, 36)
                 }
+                if !alertHistory.entries.isEmpty {
+                    alertsSection
+                        .padding(.top, 36)
+                }
+                detailsSection
+                    .padding(.top, 36)
             }
-            // Same column as the grouped forms on every other page, so the
-            // window keeps one grid as you move between pages.
+            // Same column as the grouped forms on every other page.
             .padding(.horizontal, GroupedFormMetrics.rowInset)
             .frame(maxWidth: GroupedFormMetrics.maxWidth, alignment: .leading)
             .padding(.horizontal, GroupedFormMetrics.outerMargin)
-            .padding(.top, 20)
+            .padding(.top, 8)
             .padding(.bottom, 40)
             .frame(maxWidth: .infinity)
         }
         .onAppear { SystemMonitor.shared.panelDidAppear() }
         .onDisappear { SystemMonitor.shared.panelDidDisappear() }
-        .task(id: features.isAvailable(.monitorCPU) || features.isAvailable(.monitorMemory)) {
-            await refreshProcessesLoop()
-        }
+        .task(id: showsCPU || showsMemory) { await refreshProcessesLoop() }
     }
 
-    // MARK: - Status
+    // MARK: - Identity and verdict
 
     private static let computerName: String? =
         SCDynamicStoreCopyComputerName(nil, nil) as String?
+
+    private static let durationFormatter: DateComponentsFormatter = {
+        let formatter = DateComponentsFormatter()
+        formatter.unitsStyle = .abbreviated
+        formatter.allowedUnits = [.day, .hour, .minute]
+        formatter.maximumUnitCount = 2
+        return formatter
+    }()
+
+    /// One duration style everywhere on the page ("4d 3h", "3h 2m").
+    private static func duration(_ seconds: TimeInterval) -> String {
+        durationFormatter.string(from: max(60, seconds)) ?? MetricFormat.uptime(Int(seconds))
+    }
+
+    private var identityLine: some View {
+        HStack(alignment: .center, spacing: Space.xs) {
+            BrandMark(width: 16, tint: brand)
+                .accessibilityHidden(true)
+            eyebrow(Self.computerName ?? t(.thisMac))
+            Spacer(minLength: Space.m)
+            eyebrow(GuideText.f(.dashSubtitle, "", Self.duration(ProcessInfo.processInfo.systemUptime),
+                                language: lang)
+                .trimmingCharacters(in: CharacterSet(charactersIn: " ·")))
+        }
+    }
+
+    private func eyebrow(_ text: String) -> some View {
+        Text(text.uppercased(with: Locale.current))
+            .font(Typo.eyebrow)
+            .tracking(Typo.eyebrowTracking)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+    }
 
     private var temperatureUnit: TemperatureUnit { TemperatureUnit(rawValue: temperatureUnitRaw) ?? .celsius }
     private func temp(_ value: Double) -> String { MetricFormat.temperature(value, unit: temperatureUnit) }
@@ -136,8 +175,8 @@ struct DashboardView: View {
 
     private var otherDrives: [DiskDeviceReading] {
         guard let devices = snapshot.disk?.devices, let main = mainDisk else { return [] }
-        // Real drives and partitions only: mounted installer disk images
-        // are small and would bury the useful rows.
+        // Real drives and partitions only: mounted installer disk images are
+        // small and would bury the useful rows.
         return devices.filter { $0.id != main.id && $0.totalBytes >= 8_000_000_000 }
     }
 
@@ -148,95 +187,113 @@ struct DashboardView: View {
                                  battery: snapshot.power, formatTemperature: temp)
     }
 
-    private var statusHeader: some View {
+    private var verdict: some View {
         let status = status
-        let dot: Color = status.level == .good ? PanelMetricColor.green(for: scheme)
-                                               : PanelMetricColor.orange(for: scheme)
+        let tint: Color = status.level == .good ? PanelMetricColor.green(for: scheme)
+                                                : PanelMetricColor.orange(for: scheme)
         let detail = status.detailArgument.map { GuideText.f(status.detailKey, $0, language: lang) }
             ?? t(status.detailKey)
-        return HStack(alignment: .firstTextBaseline, spacing: Space.s) {
-            Circle()
-                .fill(dot)
-                .frame(width: 8, height: 8)
-                .alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] + 4 }
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(t(status.title))
-                    .font(Typo.lead)
+        return HStack(alignment: .center, spacing: Space.l) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    Circle()
+                        .fill(tint)
+                        .frame(width: 9, height: 9)
+                        .alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] + 7 }
+                        .accessibilityHidden(true)
+                    Text(t(status.title))
+                        .font(Typo.display)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 Text(detail)
                     .font(Typo.body)
                     .foregroundStyle(.secondary)
+                    .padding(.leading, 19)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            Spacer(minLength: Space.m)
+            Spacer(minLength: 0)
             if status.action == .cleaner,
                FeatureVisibilitySupport.isPageVisible(.cleaner, isAvailable: { features.isAvailable($0) }) {
                 Button(t(.openCleaner)) { router.request(FeatureSettingsDestination(.cleaner)) }
                     .buttonStyle(.borderedProminent)
-            } else {
-                Text(GuideText.f(.dashSubtitle, Self.computerName ?? t(.thisMac),
-                                 MetricFormat.uptime(Int(ProcessInfo.processInfo.systemUptime)),
-                                 language: lang))
-                    .font(Typo.secondary)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                    .controlSize(.large)
             }
         }
         .accessibilityElement(children: .combine)
     }
 
-    // MARK: - Vitals strip
+    // MARK: - Readings
+
+    private enum Graphic {
+        case history([Double])
+        case remaining(Double)
+        case none
+    }
 
     private struct Reading: Identifiable {
         let id: String
         let label: String
-        let value: String
+        let number: String
+        let unit: String
         let caption: String
-        let fraction: Double?
+        let graphic: Graphic
         let severity: SanityDesign.Severity
         var help: String? = nil
     }
 
+    /// Splits "552 GB" into ("552", "GB") and "43%" into ("43", "%"), so the
+    /// unit can be set smaller than the figure.
+    private static func split(_ formatted: String) -> (String, String) {
+        if formatted.hasSuffix("%") { return (String(formatted.dropLast()), "%") }
+        if let space = formatted.lastIndex(of: " ") {
+            return (String(formatted[..<space]), String(formatted[formatted.index(after: space)...]))
+        }
+        return (formatted, "")
+    }
+
     private var readings: [Reading] {
         var items: [Reading] = []
-        if features.isAvailable(.monitorCPU) {
+        if showsCPU {
             let cpu = snapshot.cpuUsage
             let load: GuideKey = (cpu ?? 0) >= 0.7 ? .loadHeavy : (cpu ?? 0) >= 0.35 ? .loadModerate : .loadLight
-            items.append(Reading(id: "cpu", label: t(.processor),
-                                 value: cpu.map(MetricFormat.percent) ?? "—",
+            let (number, unit) = cpu.map { Self.split(MetricFormat.percent($0)) } ?? ("—", "")
+            items.append(Reading(id: "cpu", label: t(.processor), number: number, unit: unit,
                                  caption: cpu == nil ? "" : t(load),
-                                 fraction: cpu,
+                                 graphic: .history(snapshot.cpuHistory),
                                  severity: (cpu ?? 0) >= 0.95 ? .critical : (cpu ?? 0) >= 0.85 ? .warning : .normal,
                                  help: snapshot.cpuTemperature.map(temp)))
         }
-        if features.isAvailable(.monitorMemory) {
+        if showsMemory {
             let fraction: Double? = {
                 guard let used = snapshot.memoryUsed, let total = snapshot.memoryTotal, total > 0 else { return nil }
                 return Double(used) / Double(total)
             }()
+            // Caption by pressure, the honest measure: macOS uses spare memory
+            // for cache, so a high percentage alone is not a problem.
             let (word, severity): (GuideKey, SanityDesign.Severity) = switch snapshot.memoryPressure {
-            case .critical: (.memLow, .critical)
-            case .warning: (.memTight, .warning)
-            default: (.memRoomy, .normal)
+            case .critical: (.pressureCritical, .critical)
+            case .warning: (.pressureWarning, .warning)
+            default: (.pressureNormal, .normal)
             }
+            let (number, unit) = fraction.map { Self.split(MetricFormat.percent($0)) } ?? ("—", "")
             let amounts = snapshot.memoryUsed.flatMap { used in
                 snapshot.memoryTotal.map {
                     GuideText.f(.amountOf, MetricFormat.bytes(used), MetricFormat.bytes($0), language: lang)
                 }
             }
-            items.append(Reading(id: "memory", label: t(.memory),
-                                 value: fraction.map(MetricFormat.percent) ?? "—",
-                                 caption: fraction == nil ? "" : t(word),
-                                 fraction: fraction, severity: severity, help: amounts))
+            items.append(Reading(id: "memory", label: t(.memory), number: number, unit: unit,
+                                 caption: fraction == nil ? "" : t(word).capitalizedFirst,
+                                 graphic: .history(snapshot.memoryHistory),
+                                 severity: severity, help: amounts))
         }
         if features.isAvailable(.monitorDisk), let disk = mainDisk {
-            let severity: SanityDesign.Severity = disk.usedFraction >= 0.95 ? .critical
-                : disk.usedFraction >= 0.9 ? .warning : .normal
-            items.append(Reading(id: "storage", label: t(.storage),
-                                 value: MetricFormat.diskBytes(disk.freeBytes),
+            let free = 1 - disk.usedFraction
+            let (number, unit) = Self.split(MetricFormat.diskBytes(disk.freeBytes))
+            items.append(Reading(id: "storage", label: t(.storage), number: number, unit: unit,
                                  caption: GuideText.f(.freeOfTotal, MetricFormat.diskBytes(disk.totalBytes),
-                                                      language: lang),
-                                 fraction: disk.usedFraction, severity: severity))
+                                                      language: lang).capitalizedFirst,
+                                 graphic: .remaining(free),
+                                 severity: free <= 0.05 ? .critical : free <= 0.1 ? .warning : .normal))
         }
         if features.isAvailable(.monitorPower), let power = snapshot.power, !power.isEmpty {
             if power.hasBattery, let charge = power.chargePercent {
@@ -246,148 +303,208 @@ struct DashboardView: View {
                 } else if power.externalConnected {
                     caption = t(.onAdapter).capitalizedFirst
                 } else if let seconds = power.timeRemainingSeconds, seconds > 0 {
-                    caption = GuideText.f(.timeLeft, MetricFormat.uptime(Int(seconds)), language: lang).capitalizedFirst
+                    caption = GuideText.f(.timeLeft, Self.duration(seconds), language: lang).capitalizedFirst
                 } else {
                     caption = ""
                 }
-                let low = !power.isCharging && !power.externalConnected
-                items.append(Reading(id: "battery", label: t(.battery), value: "\(charge)%",
-                                     caption: caption, fraction: Double(charge) / 100,
-                                     severity: low && charge <= 10 ? .critical : low && charge <= 20 ? .warning : .normal,
+                let draining = !power.isCharging && !power.externalConnected
+                items.append(Reading(id: "battery", label: t(.battery), number: "\(charge)", unit: "%",
+                                     caption: caption, graphic: .remaining(Double(charge) / 100),
+                                     severity: draining && charge <= 10 ? .critical
+                                         : draining && charge <= 20 ? .warning : .normal,
                                      help: power.healthPercent.map {
                                          GuideText.f(.health, "\(Int($0.rounded()))%", language: lang)
                                      }))
             } else if let watts = power.systemWatts {
-                items.append(Reading(id: "power", label: t(.power), value: MetricFormat.watts(watts),
-                                     caption: "", fraction: nil, severity: .normal))
+                let (number, unit) = Self.split(MetricFormat.watts(watts))
+                items.append(Reading(id: "power", label: t(.power), number: number, unit: unit,
+                                     caption: "", graphic: .history(snapshot.systemPowerHistory),
+                                     severity: .normal))
             }
         }
         return items
     }
 
     @ViewBuilder
-    private var vitalsStrip: some View {
+    private var readingsStrip: some View {
         let items = readings
         if !items.isEmpty {
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .top, spacing: 0) {
-                    ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                        if index > 0 {
-                            SanityHairline(axis: .vertical)
-                                .padding(.horizontal, Space.l)
+            VStack(spacing: 0) {
+                SanityHairline()
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .top, spacing: 0) {
+                        ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                            if index > 0 {
+                                SanityHairline(axis: .vertical)
+                                    .padding(.horizontal, Space.l)
+                            }
+                            // Equal flexible frames, gaps on the dividers:
+                            // every column gets the same width.
+                            readingView(item)
+                                .frame(minWidth: 120, maxWidth: .infinity, alignment: .leading)
                         }
-                        readingView(item)
-                            .frame(minWidth: 128, maxWidth: .infinity, alignment: .leading)
                     }
-                }
-                .fixedSize(horizontal: false, vertical: true)
+                    .fixedSize(horizontal: false, vertical: true)
 
-                Grid(alignment: .topLeading, horizontalSpacing: Space.l, verticalSpacing: Space.l) {
-                    ForEach(stride(from: 0, to: items.count, by: 2).map { $0 }, id: \.self) { row in
-                        GridRow {
-                            readingView(items[row]).frame(maxWidth: .infinity, alignment: .leading)
-                            if row + 1 < items.count {
-                                readingView(items[row + 1]).frame(maxWidth: .infinity, alignment: .leading)
-                            } else {
-                                Color.clear.gridCellUnsizedAxes([.horizontal, .vertical])
+                    Grid(alignment: .topLeading, horizontalSpacing: Space.xl, verticalSpacing: Space.l) {
+                        ForEach(Array(stride(from: 0, to: items.count, by: 2)), id: \.self) { row in
+                            GridRow {
+                                readingView(items[row])
+                                if row + 1 < items.count {
+                                    readingView(items[row + 1])
+                                } else {
+                                    Color.clear.gridCellUnsizedAxes([.horizontal, .vertical])
+                                }
                             }
                         }
                     }
                 }
+                .padding(.vertical, 20)
+                SanityHairline()
             }
         }
     }
 
     private func readingView(_ item: Reading) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(item.label)
-                .font(Typo.secondary)
+            Text(item.label.uppercased(with: Locale.current))
+                .font(Typo.eyebrow)
+                .tracking(Typo.eyebrowTracking)
                 .foregroundStyle(.secondary)
-            Text(item.value)
-                .font(Typo.metric)
                 .lineLimit(1)
-                .minimumScaleFactor(0.7)
-                .padding(.top, Space.xxs)
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
+                Text(item.number)
+                    .font(Typo.metric)
+                Text(item.unit)
+                    .font(Typo.metricUnit)
+                    .foregroundStyle(.secondary)
+            }
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .padding(.top, 6)
             Text(item.caption.isEmpty ? " " : item.caption)
                 .font(Typo.secondary)
                 .foregroundStyle(item.severity.label(scheme))
                 .lineLimit(1)
-            Group {
-                if let fraction = item.fraction {
-                    SanityMeter(fraction: fraction, severity: item.severity)
-                } else {
-                    Color.clear.frame(height: 3)
-                }
-            }
-            .padding(.top, Space.s)
+                .padding(.top, 2)
+            graphic(item)
+                .frame(height: 22)
+                .padding(.top, Space.s)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .help(item.help ?? "")
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(item.label)
-        .accessibilityValue([item.value, item.caption].filter { !$0.isEmpty }.joined(separator: ", "))
+        .accessibilityValue([item.number + item.unit, item.caption].filter { !$0.isEmpty }.joined(separator: ", "))
     }
 
-    // MARK: - Activity
-
-    private var cpuColor: Color { .accentColor }
-    private var memoryColor: Color { Color.secondary }
-
-    private var activitySection: some View {
-        VStack(alignment: .leading, spacing: Space.s) {
-            SanitySectionHeader(t(.activity)) {
-                HStack(spacing: Space.m) {
-                    if features.isAvailable(.monitorCPU) { legend(t(.processor), cpuColor) }
-                    if features.isAvailable(.monitorMemory) { legend(t(.memory), memoryColor) }
-                }
+    @ViewBuilder
+    private func graphic(_ item: Reading) -> some View {
+        switch item.graphic {
+        case .history(let values):
+            Sparkline(values: values,
+                      color: item.severity == .normal ? brand : item.severity.tint(scheme),
+                      maxValue: item.id == "power" ? nil : 1,
+                      fillOpacity: 0.14, lineWidth: 1.5, showsZeroBaseline: true)
+                .accessibilityHidden(true)
+        case .remaining(let fraction):
+            VStack {
+                Spacer(minLength: 0)
+                SanityMeter(fraction: fraction, severity: item.severity)
             }
-            ActivityChart(cpu: features.isAvailable(.monitorCPU) ? snapshot.cpuHistory : [],
-                          memory: features.isAvailable(.monitorMemory) ? snapshot.memoryHistory : [],
-                          cpuColor: cpuColor, memoryColor: memoryColor)
-                .frame(height: 132)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(t(.activityCaption))
-        }
-    }
-
-    private func legend(_ title: String, _ color: Color) -> some View {
-        HStack(spacing: 5) {
-            Capsule().fill(color).frame(width: 10, height: 2.5)
-            Text(title).font(Typo.secondary).foregroundStyle(.secondary)
+            .padding(.bottom, 1)
+        case .none:
+            Color.clear
         }
     }
 
     // MARK: - What's using your Mac
 
-    @ViewBuilder
+    private var processSort: BreakdownKind {
+        if !showsCPU { return .memory }
+        if !showsMemory { return .cpu }
+        return processSortRaw == "memory" ? .memory : .cpu
+    }
+
+    private struct UsageRow: Identifiable {
+        let id: String
+        let name: String
+        let pid: pid_t?
+        let value: Double
+        let app: NSRunningApplication?
+    }
+
+    /// Ordinary apps first, merged by name (helpers of one app report under
+    /// their responsible app's name); everything else becomes one
+    /// "Background processes" row so system daemons don't crowd the list.
+    private var usageRows: [UsageRow] {
+        let source = processSort == .cpu ? topCPU : topMemory
+        var apps: [String: UsageRow] = [:]
+        var order: [String] = []
+        var background = 0.0
+        for row in source {
+            if let app = NSRunningApplication(processIdentifier: row.pid), app.activationPolicy == .regular {
+                let name = app.localizedName ?? row.name
+                if let existing = apps[name] {
+                    apps[name] = UsageRow(id: name, name: name, pid: existing.pid,
+                                          value: existing.value + row.value, app: existing.app)
+                } else {
+                    apps[name] = UsageRow(id: name, name: name, pid: row.pid, value: row.value, app: app)
+                    order.append(name)
+                }
+            } else {
+                background += row.value
+            }
+        }
+        var rows = order.compactMap { apps[$0] }.sorted { $0.value > $1.value }.prefix(5).map { $0 }
+        if background > 0 {
+            rows.append(UsageRow(id: "background", name: t(.backgroundProcesses), pid: nil,
+                                 value: background, app: nil))
+        }
+        return rows
+    }
+
+    private func formatted(_ value: Double) -> String {
+        processSort == .cpu ? String(format: "%.1f%%", value) : MetricFormat.bytes(UInt64(max(0, value)))
+    }
+
     private var processesSection: some View {
-        let showCPU = features.isAvailable(.monitorCPU)
-        let showMemory = features.isAvailable(.monitorMemory)
-        let kind: BreakdownKind = showCPU && showMemory ? processKind : (showCPU ? .cpu : .memory)
-        let rows = Array((kind == .cpu ? topCPU : topMemory).prefix(6))
-        VStack(alignment: .leading, spacing: Space.s) {
+        let rows = usageRows
+        return VStack(alignment: .leading, spacing: Space.xs) {
             SanitySectionHeader(t(.whatsUsing)) {
-                if showCPU && showMemory {
-                    Picker("", selection: $processKind) {
-                        Text(t(.processor)).tag(BreakdownKind.cpu)
-                        Text(t(.memory)).tag(BreakdownKind.memory)
+                if showsCPU && showsMemory {
+                    // A borderless menu that reads as part of the label row.
+                    Menu {
+                        Picker("", selection: Binding(get: { processSort == .memory ? "memory" : "cpu" },
+                                                      set: { processSortRaw = $0 })) {
+                            Text(t(.processor)).tag("cpu")
+                            Text(t(.memory)).tag("memory")
+                        }
+                        .pickerStyle(.inline)
+                        .labelsHidden()
+                    } label: {
+                        Text(processSort == .cpu ? t(.processor) : t(.memory))
+                            .font(Typo.secondary)
                     }
-                    .pickerStyle(.segmented)
-                    .labelsHidden()
-                    .controlSize(.small)
+                    .menuStyle(.borderlessButton)
+                    .menuIndicator(.visible)
                     .fixedSize()
+                    .foregroundStyle(.secondary)
                 }
             }
             if rows.isEmpty {
                 Text(processesLoaded ? t(.nothingToShow) : t(.sampling))
                     .font(Typo.body)
                     .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, minHeight: 60, alignment: .leading)
+                    .frame(maxWidth: .infinity, minHeight: 64, alignment: .leading)
             } else {
-                ProcessTable(rows: rows, kind: kind,
-                             appTitle: t(.appColumn),
-                             valueTitle: kind == .cpu ? "% " + t(.processor) : t(.memory),
-                             quitTitle: t(.quitAppShort))
-                    .frame(height: CGFloat(rows.count) * 26 + 30)
+                VStack(spacing: 0) {
+                    ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in
+                        if index > 0 { SanityHairline().padding(.leading, 30) }
+                        UsageRowView(name: row.name, pid: row.pid, value: formatted(row.value),
+                                     app: row.app, quitTitle: t(.quitAppShort))
+                    }
+                }
             }
         }
     }
@@ -398,13 +515,13 @@ struct DashboardView: View {
         while !Task.isCancelled {
             let interval = TimeInterval(SanityDefaults.sanitizedMonitorInterval(monitorInterval))
             let cpuPercent = monitor.snapshot.cpuUsage.map { $0 * 100 }
-            let wantCPU = features.isAvailable(.monitorCPU)
-            let wantMemory = features.isAvailable(.monitorMemory)
+            let wantCPU = showsCPU
+            let wantMemory = showsMemory
             guard wantCPU || wantMemory else { return }
             let rows = await Task.detached(priority: .utility) { () -> ([ProcessUsage], [ProcessUsage]) in
                 let service = ProcessUsageService.shared
-                let cpu = wantCPU ? service.top(.cpu, limit: 6, sampleInterval: interval, cpuPercentage: cpuPercent) : []
-                let memory = wantMemory ? service.top(.memory, limit: 6) : []
+                let cpu = wantCPU ? service.top(.cpu, limit: 16, sampleInterval: interval, cpuPercentage: cpuPercent) : []
+                let memory = wantMemory ? service.top(.memory, limit: 16) : []
                 return (cpu, memory)
             }.value
             guard !Task.isCancelled else { return }
@@ -426,12 +543,12 @@ struct DashboardView: View {
             }
             VStack(spacing: 0) {
                 ForEach(Array(alertHistory.entries.prefix(4).enumerated()), id: \.element.id) { index, entry in
-                    if index > 0 { SanityHairline() }
-                    HStack(alignment: .firstTextBaseline, spacing: Space.s) {
+                    if index > 0 { SanityHairline().padding(.leading, 16) }
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
                         Circle()
                             .fill(PanelMetricColor.orange(for: scheme))
                             .frame(width: 6, height: 6)
-                            .alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] + 3 }
+                            .alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] + 4 }
                             .accessibilityHidden(true)
                         Text(entry.title).font(Typo.body)
                         Text(entry.body).font(Typo.body).foregroundStyle(.secondary).lineLimit(1)
@@ -441,7 +558,7 @@ struct DashboardView: View {
                             .foregroundStyle(.secondary)
                             .monospacedDigit()
                     }
-                    .padding(.vertical, Space.xs)
+                    .padding(.vertical, 9)
                     .accessibilityElement(children: .combine)
                 }
             }
@@ -458,7 +575,7 @@ struct DashboardView: View {
 
     private var detailRows: [DetailRow] {
         var rows: [DetailRow] = []
-        if features.isAvailable(.monitorCPU), let cpuTemp = snapshot.cpuTemperature {
+        if showsCPU, let cpuTemp = snapshot.cpuTemperature {
             rows.append(DetailRow(id: "cputemp", label: t(.processor), value: temp(cpuTemp)))
         }
         if features.isAvailable(.monitorGPU), let gpu = snapshot.gpuUsage {
@@ -466,7 +583,7 @@ struct DashboardView: View {
                 .compactMap { $0 }.joined(separator: "  ·  ")
             rows.append(DetailRow(id: "gpu", label: t(.graphics), value: value))
         }
-        if features.isAvailable(.monitorMemory), let used = snapshot.memoryUsed, let total = snapshot.memoryTotal {
+        if showsMemory, let used = snapshot.memoryUsed, let total = snapshot.memoryTotal {
             rows.append(DetailRow(id: "mem", label: t(.memory),
                                   value: GuideText.f(.amountOf, MetricFormat.bytes(used), MetricFormat.bytes(total),
                                                      language: lang)))
@@ -524,14 +641,15 @@ struct DashboardView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                         .font(Typo.body)
-                        .padding(.vertical, 7)
+                        .padding(.vertical, 8)
                     }
                 }
                 .padding(.top, Space.xs)
             } label: {
-                Text(t(.moreDetails))
-                    .font(Typo.section)
-                    .foregroundStyle(.primary)
+                Text(t(.moreDetails).uppercased(with: Locale.current))
+                    .font(Typo.eyebrow)
+                    .tracking(Typo.eyebrowTracking)
+                    .foregroundStyle(.secondary)
             }
             .disclosureGroupStyle(SanityDisclosureStyle())
         }
@@ -556,11 +674,11 @@ private struct SanityDisclosureStyle: DisclosureGroupStyle {
                 }
             } label: {
                 HStack(spacing: 6) {
+                    configuration.label
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 10, weight: .bold))
+                        .font(.system(size: 9, weight: .bold))
                         .foregroundStyle(.secondary)
                         .rotationEffect(.degrees(configuration.isExpanded ? 90 : 0))
-                    configuration.label
                     Spacer()
                 }
                 .contentShape(Rectangle())
@@ -574,108 +692,66 @@ private struct SanityDisclosureStyle: DisclosureGroupStyle {
     }
 }
 
-/// Processor and memory history on one plot with a quiet percentage scale.
-private struct ActivityChart: View {
-    let cpu: [Double]
-    let memory: [Double]
-    let cpuColor: Color
-    let memoryColor: Color
+/// One row of "What's using your Mac". Apps can be brought forward with a
+/// double-click and quit from the context menu or the hover button.
+private struct UsageRowView: View {
+    let name: String
+    let pid: pid_t?
+    let value: String
+    let app: NSRunningApplication?
+    let quitTitle: String
+    @State private var hovering = false
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
-        HStack(alignment: .top, spacing: SanityDesign.Space.xs) {
-            ZStack {
-                VStack(spacing: 0) {
-                    SanityHairline()
-                    Spacer()
-                    SanityHairline().opacity(0.6)
-                    Spacer()
-                    SanityHairline()
-                }
-                if memory.count >= 2 {
-                    Sparkline(values: memory, color: memoryColor.opacity(0.9), maxValue: 1,
-                              fillOpacity: 0.0, lineWidth: 1.5)
-                }
-                if cpu.count >= 2 {
-                    Sparkline(values: cpu, color: cpuColor, maxValue: 1, fillOpacity: 0.12, lineWidth: 1.75)
-                }
-            }
-            VStack(alignment: .leading) {
-                Text("100%")
-                Spacer()
-                Text("50%")
-                Spacer()
-                Text("0%")
-            }
-            .font(SanityDesign.Typography.caption.monospacedDigit())
-            .foregroundStyle(.tertiary)
-            .frame(width: 34, alignment: .leading)
-            .padding(.vertical, -6)
-        }
-    }
-}
-
-/// A native table of the busiest processes. Double-click brings an app to
-/// the front; right-click offers Quit for ordinary apps.
-private struct ProcessTable: View {
-    let rows: [ProcessUsage]
-    let kind: BreakdownKind
-    let appTitle: String
-    let valueTitle: String
-    let quitTitle: String
-    @State private var selection: ProcessUsage.ID?
-
-    private func value(_ row: ProcessUsage) -> String {
-        kind == .cpu ? String(format: "%.1f", row.value) : MetricFormat.bytes(UInt64(max(0, row.value)))
-    }
-
-    private static func regularApp(_ pid: pid_t) -> NSRunningApplication? {
-        guard let app = NSRunningApplication(processIdentifier: pid),
-              app.activationPolicy == .regular,
-              app.processIdentifier != ProcessInfo.processInfo.processIdentifier else { return nil }
-        return app
-    }
-
-    var body: some View {
-        Table(rows, selection: $selection) {
-            TableColumn(appTitle) { row in
-                HStack(spacing: 8) {
-                    Image(nsImage: ResponsibleProcess.icon(for: row.pid))
+        HStack(spacing: 10) {
+            Group {
+                if let pid {
+                    Image(nsImage: ResponsibleProcess.icon(for: pid))
                         .resizable()
-                        .frame(width: 16, height: 16)
-                    Text(row.name)
-                        .lineLimit(1)
-                        .truncationMode(.middle)
+                } else {
+                    Image(systemName: "gearshape.2")
+                        .font(.system(size: 13))
+                        .foregroundStyle(.secondary)
                 }
             }
-            TableColumn(valueTitle) { row in
-                Text(value(row))
-                    .monospacedDigit()
-                    .frame(maxWidth: .infinity, alignment: .trailing)
+            .frame(width: 20, height: 20)
+            .accessibilityHidden(true)
+            Text(name)
+                .font(SanityDesign.Typography.body)
+                .foregroundStyle(pid == nil ? .secondary : .primary)
+                .lineLimit(1)
+                .truncationMode(.middle)
+            Spacer(minLength: SanityDesign.Space.s)
+            if hovering, let app {
+                Button(quitTitle) { app.terminate() }
+                    .controlSize(.small)
             }
-            .width(min: 80, ideal: 96, max: 120)
+            Text(value)
+                .font(SanityDesign.Typography.body.monospacedDigit())
+                .foregroundStyle(.secondary)
+                .frame(minWidth: 64, alignment: .trailing)
         }
-        .tableStyle(.inset(alternatesRowBackgrounds: true))
-        .scrollDisabled(true)
-        .contextMenu(forSelectionType: ProcessUsage.ID.self) { ids in
-            if let pid = ids.first, let app = Self.regularApp(pid) {
-                Button(quitTitle + " " + (app.localizedName ?? "")) { app.terminate() }
-            }
-        } primaryAction: { ids in
-            if let pid = ids.first, let row = rows.first(where: { $0.pid == pid }),
-               ProcessUsageService.shared.canActivate(row) {
-                ProcessUsageService.shared.activate(row)
+        .padding(.vertical, 7)
+        .contentShape(Rectangle())
+        .onHover { hovering = $0 }
+        .onTapGesture(count: 2) { app?.activate() }
+        .contextMenu {
+            if let app {
+                Button(quitTitle + " " + name) { app.terminate() }
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityAction(named: Text(quitTitle)) { app?.terminate() }
     }
 }
 
-// MARK: - Setup strip
+// MARK: - Setup line
 
-/// First-run guidance as a single line rather than a card: progress, the
-/// next step and its button. The full list sits in a popover. It removes
-/// itself once every step is done or the person dismisses it.
-private struct SetupStrip: View {
+/// First-run guidance as one quiet line of text, not a box: progress, the
+/// next step as a link, the full checklist in a popover. It disappears once
+/// every step is done or the person dismisses it.
+private struct SetupLine: View {
     let onDismiss: () -> Void
     @ObservedObject private var l10n = L10n.shared
     @ObservedObject private var permissions = Permissions.shared
@@ -721,45 +797,48 @@ private struct SetupStrip: View {
         let steps = steps
         let done = steps.filter(\.isDone).count
         if let next = steps.first(where: { !$0.isDone }) {
-            HStack(spacing: SanityDesign.Space.s) {
+            HStack(spacing: 8) {
                 Button {
                     showingSteps.toggle()
                 } label: {
                     HStack(spacing: 6) {
-                        ProgressRing(fraction: Double(done) / Double(steps.count))
+                        ProgressRing(fraction: Double(done) / Double(steps.count),
+                                     tint: SanityDesign.brand(scheme))
                         Text(GuideText.f(.gsProgress, "\(done)", "\(steps.count)", language: l10n.language))
                             .monospacedDigit()
+                            .foregroundStyle(.secondary)
                     }
-                    .font(SanityDesign.Typography.secondary)
-                    .foregroundStyle(.secondary)
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .help(t(.allSteps))
                 .popover(isPresented: $showingSteps, arrowEdge: .bottom) { stepsPopover(steps) }
 
-                Text(next.title)
-                    .font(SanityDesign.Typography.body.weight(.medium))
-                    .lineLimit(1)
-                    .help(next.detail)
-                Spacer(minLength: SanityDesign.Space.s)
-                Button(next.button, action: next.action)
-                    .controlSize(.small)
-                Button(action: onDismiss) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 9, weight: .bold))
-                        .foregroundStyle(.secondary)
-                        .frame(width: 16, height: 16)
-                        .contentShape(Rectangle())
+                Text("·").foregroundStyle(.tertiary)
+
+                Button {
+                    next.action()
+                } label: {
+                    HStack(spacing: 2) {
+                        Text(next.title)
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 9, weight: .semibold))
+                    }
+                    .foregroundStyle(SanityDesign.brand(scheme))
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .help(t(.hideHelp))
-                .accessibilityLabel(t(.hide))
+                .help(next.detail)
+
+                Spacer(minLength: SanityDesign.Space.s)
+
+                Button(t(.hide), action: onDismiss)
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.tertiary)
+                    .help(t(.hideHelp))
             }
-            .padding(.horizontal, SanityDesign.Space.s)
-            .padding(.vertical, SanityDesign.Space.xs)
-            .background(Color.primary.opacity(scheme == .dark ? 0.06 : 0.04),
-                        in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+            .font(SanityDesign.Typography.secondary)
+            .padding(.leading, 19)
             .onAppear {
                 permissions.refresh()
                 launchesAtLogin = LaunchAtLogin.isEnabled
@@ -801,16 +880,17 @@ private struct SetupStrip: View {
 
 private struct ProgressRing: View {
     let fraction: Double
+    let tint: Color
 
     var body: some View {
         ZStack {
             Circle().stroke(Color.primary.opacity(0.12), lineWidth: 2)
             Circle()
                 .trim(from: 0, to: max(0.02, fraction))
-                .stroke(Color.accentColor, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                .stroke(tint, style: StrokeStyle(lineWidth: 2, lineCap: .round))
                 .rotationEffect(.degrees(-90))
         }
-        .frame(width: 12, height: 12)
+        .frame(width: 11, height: 11)
         .accessibilityHidden(true)
     }
 }

@@ -152,15 +152,35 @@ struct SettingsView: View {
                                                          keywords: $0.keywords)
                 }
                 if !items.isEmpty {
-                    Section(section.title) {
-                        ForEach(items) { item in
-                            Label(item.title, systemImage: item.icon).tag(item.page)
+                    if section.title.isEmpty {
+                        Section {
+                            ForEach(items) { item in sidebarRow(item) }
+                        }
+                    } else {
+                        Section(section.title) {
+                            ForEach(items) { item in sidebarRow(item) }
                         }
                     }
                 }
             }
         }
         .listStyle(.sidebar)
+    }
+
+    /// The Dashboard row carries the Sanity mark in the brand colour; every
+    /// other page uses its SF Symbol like any macOS settings sidebar.
+    @ViewBuilder
+    private func sidebarRow(_ item: SettingsDirectoryItem) -> some View {
+        if item.page == .dashboard {
+            Label {
+                Text(item.title)
+            } icon: {
+                SidebarBrandIcon()
+            }
+            .tag(item.page)
+        } else {
+            Label(item.title, systemImage: item.icon).tag(item.page)
+        }
     }
 
     /// The open page's name, shown in the window's title bar the way
@@ -2108,5 +2128,13 @@ private extension View {
                 RoundedRectangle(cornerRadius: 6)
                     .fill(isSelected ? Color.accentColor.opacity(0.18) : .clear)
             }
+    }
+}
+
+
+private struct SidebarBrandIcon: View {
+    @Environment(\.colorScheme) private var scheme
+    var body: some View {
+        BrandMark(width: 18, tint: SanityDesign.brand(scheme))
     }
 }

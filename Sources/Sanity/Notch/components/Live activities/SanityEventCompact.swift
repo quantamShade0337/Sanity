@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Ethan Soh
 
+import AppKit
 import SwiftUI
 
 /// The one compact presentation every short-lived notch alert uses, modelled
@@ -21,10 +22,15 @@ struct IslandCompact: View {
         case batteryRing(Double)
         /// Glyph only (for example AirPods before macOS reports a charge).
         case none
+        /// Short text in a semantic colour, like the charge percentage.
+        case tintedText(String, Color)
     }
 
     let icon: String
     let trailing: Trailing
+    /// A word in place of the glyph, for alerts where iPhone leads with text
+    /// (Charging, Low Power).
+    var leadingText: String? = nil
     /// Dimmed for "off" states, as iPhone does for Silent off or Focus off.
     var isActive: Bool = true
     let notchWidth: CGFloat
@@ -32,8 +38,19 @@ struct IslandCompact: View {
 
     /// Compact regions are narrow on iPhone; long text truncates rather than
     /// stretching the island.
-    static let sideWidth: CGFloat = 72
+    static let sideWidth: CGFloat = 88
     static let edgeInset: CGFloat = 14
+    /// Extra room on each side of the measured notch so nothing ever sits
+    /// under the camera housing. The measured width already includes 4 pt.
+    static let cameraClearance: CGFloat = 8
+
+    private static let labelFont = NSFont.systemFont(ofSize: 13, weight: .semibold)
+
+    /// Whether a label fits its side at full size. Text is never clipped or
+    /// shrunk: a label that doesn't fit is replaced by a glyph instead.
+    static func fits(_ label: String) -> Bool {
+        (label as NSString).size(withAttributes: [.font: labelFont]).width <= sideWidth
+    }
 
     private var ink: Color { isActive ? .white : .white.opacity(0.55) }
 
@@ -46,17 +63,27 @@ struct IslandCompact: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            Image(systemName: icon)
-                .font(.system(size: 14, weight: .semibold))
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(ink)
-                .contentTransition(.symbolEffect(.replace))
-                .frame(width: Self.sideWidth, height: height, alignment: .leading)
-                .padding(.leading, Self.edgeInset)
+            Group {
+                if let leadingText, Self.fits(leadingText) {
+                    Text(leadingText)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(ink)
+                        .lineLimit(1)
+                        .fixedSize()
+                } else {
+                    Image(systemName: icon)
+                        .font(.system(size: 14, weight: .semibold))
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(ink)
+                        .contentTransition(.symbolEffect(.replace))
+                }
+            }
+            .frame(width: Self.sideWidth, height: height, alignment: .leading)
+            .padding(.leading, Self.edgeInset)
 
             Rectangle()
                 .fill(.black)
-                .frame(width: notchWidth - 20, height: height)
+                .frame(width: notchWidth + Self.cameraClearance, height: height)
 
             trailingView
                 .frame(width: Self.sideWidth, height: height, alignment: .trailing)
@@ -77,11 +104,19 @@ struct IslandCompact: View {
     private var trailingView: some View {
         switch trailing {
         case .text(let label):
-            Text(label)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(ink)
-                .lineLimit(1)
-                .truncationMode(.tail)
+            if Self.fits(label) {
+                Text(label)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(ink)
+                    .lineLimit(1)
+                    .fixedSize()
+            } else {
+                // Too long for the island (a long device name): a checkmark
+                // says "done" without clipping a word.
+                Image(systemName: "checkmark")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(ink)
+            }
         case .level(let value, let showsPercentage):
             if showsPercentage {
                 Text("\(Int((min(1, max(0, value)) * 100).rounded()))%")
@@ -97,12 +132,19 @@ struct IslandCompact: View {
                 .frame(width: 18, height: 18)
         case .none:
             Color.clear
+        case .tintedText(let label, let color):
+            Text(label)
+                .font(.system(size: 13, weight: .semibold, design: .rounded).monospacedDigit())
+                .foregroundStyle(color)
+                .lineLimit(1)
+                .fixedSize()
+                .contentTransition(.numericText())
         }
     }
 
     private var accessibilityText: String {
         switch trailing {
-        case .text(let label): return label
+        case .text(let label), .tintedText(let label, _): return [leadingText, label].compactMap { $0 }.joined(separator: ", ")
         case .level(let value, _), .batteryRing(let value): return "\(Int((value * 100).rounded()))%"
         case .none: return ""
         }

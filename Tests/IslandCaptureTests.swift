@@ -81,6 +81,7 @@ final class IslandCaptureTests: XCTestCase {
             Scenario(name: "volume-then-event", steps: [(0, peek(.volume, 0.4)),
                                                         (0.3, peek(.event, 1, icon: "camera.viewfinder",
                                                                    label: "Saved", duration: 2))]),
+            Scenario(name: "battery", steps: [(0, { coordinator.toggleExpandingView(status: true, type: .battery) })]),
             Scenario(name: "event-to-event", steps: [(0, peek(.event, 1, icon: "doc.on.clipboard.fill",
                                                               label: "Copied", duration: 2)),
                                                      (0.6, peek(.event, 1, icon: "camera.viewfinder",

@@ -20,7 +20,6 @@ class BatteryStatusViewModel: ObservableObject {
     @Published private(set) var isInLowPowerMode: Bool = false
     @Published private(set) var isInitial: Bool = false
     @Published private(set) var timeToFullCharge: Int = 0
-    @Published private(set) var statusText: String = ""
 
     private let managerBattery = BatteryActivityManager.shared
     private var managerBatteryId: Int?
@@ -53,12 +52,12 @@ class BatteryStatusViewModel: ObservableObject {
     private func handleBatteryEvent(_ event: BatteryActivityManager.BatteryEvent) {
         switch event {
         case .powerSourceChanged(let isPluggedIn):
-            print("🔌 Power source: \(isPluggedIn ? "Connected" : "Disconnected")")
             withAnimation {
                 self.isPluggedIn = isPluggedIn
-                self.statusText = isPluggedIn ? "Plugged In" : "Unplugged"
-                self.notifyImportanChangeStatus()
             }
+            // iPhone shows the island when power connects, not when it
+            // disconnects.
+            if isPluggedIn { self.notifyImportanChangeStatus() }
 
         case .batteryLevelChanged(let level):
             print("🔋 Battery level: \(Int(level))%")
@@ -67,25 +66,16 @@ class BatteryStatusViewModel: ObservableObject {
             }
 
         case .lowPowerModeChanged(let isEnabled):
-            print("⚡ Low power mode: \(isEnabled ? "Enabled" : "Disabled")")
-            self.notifyImportanChangeStatus()
             withAnimation {
                 self.isInLowPowerMode = isEnabled
-                self.statusText = "Low Power: \(self.isInLowPowerMode ? "On" : "Off")"
             }
+            if isEnabled { self.notifyImportanChangeStatus() }
 
         case .isChargingChanged(let isCharging):
-            print("🔌 Charging: \(isCharging ? "Yes" : "No")")
-            print("maxCapacity: \(self.maxCapacity)")
-            print("levelBattery: \(self.levelBattery)")
-            self.notifyImportanChangeStatus()
             withAnimation {
                 self.isCharging = isCharging
-                self.statusText =
-                    isCharging
-                    ? "Charging battery"
-                    : (self.levelBattery < self.maxCapacity ? "Not charging" : "Full charge")
             }
+            if self.isPluggedIn { self.notifyImportanChangeStatus() }
 
         case .timeToFullChargeChanged(let time):
             print("🕒 Time to full charge: \(time) minutes")
@@ -114,18 +104,46 @@ class BatteryStatusViewModel: ObservableObject {
             self.isInLowPowerMode = batteryInfo.isInLowPowerMode
             self.timeToFullCharge = batteryInfo.timeToFullCharge
             self.maxCapacity = batteryInfo.maxCapacity
-            self.statusText = batteryInfo.isPluggedIn ? "Plugged In" : "Unplugged"
         }
+    }
+
+    /// The island's left word, in iPhone's wording.
+    var islandLabel: String {
+        if isCharging { return GuideText.t(.batteryCharging) }
+        if isPluggedIn {
+            return levelBattery >= maxCapacity - 1 ? GuideText.t(.batteryCharged) : GuideText.t(.batteryNotCharging)
+        }
+        if isInLowPowerMode { return GuideText.t(.batteryLowPower) }
+        return GuideText.t(.battery)
+    }
+
+    /// The charge percentage for the island's right side.
+    var islandPercent: String { "\(Int(levelBattery.rounded()))%" }
+
+    /// Green while on power, yellow in Low Power Mode, red when low on
+    /// battery, white otherwise, as iPhone colours its battery.
+    var islandTint: Color {
+        if isPluggedIn { return .green }
+        if isInLowPowerMode { return .yellow }
+        if levelBattery <= 20 { return .red }
+        return .white
     }
 
     /// Notifies important changes in the battery status with an optional delay
     /// - Parameter delay: The delay before notifying the change, default is 0.0
-    private func notifyImportanChangeStatus(delay: Double = 0.0) {
-        Task {
+    /// Plugging in fires several events within moments of each other (power
+    /// source, then charging). Waiting briefly and showing one island with
+    /// the settled state avoids a double alert and stale wording.
+    private func notifyImportanChangeStatus(delay: Double = 0.6) {
+        pendingNotification?.cancel()
+        pendingNotification = Task { @MainActor in
             try? await Task.sleep(for: .seconds(delay))
+            guard !Task.isCancelled else { return }
             self.coordinator.toggleExpandingView(status: true, type: .battery)
         }
     }
+
+    private var pendingNotification: Task<Void, Never>?
 
     deinit {
         print("🔌 Cleaning up battery monitoring...")

@@ -285,34 +285,18 @@ struct NotchContentView: View {
                     if coordinator.expandingView.type == .battery && coordinator.expandingView.show
                         && vm.notchState == .closed && Defaults[.showPowerStatusNotifications]
                     {
-                        // Same geometry as every other compact alert: equal
-                        // sides and the same camera gap, so the camera stays
-                        // centred and the island never changes width between
-                        // alerts.
-                        HStack(spacing: 0) {
-                            Text(batteryModel.statusText)
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundStyle(.white)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.8)
-                                .frame(width: IslandCompact.sideWidth, alignment: .leading)
-                                .padding(.leading, IslandCompact.edgeInset)
-
-                            Rectangle()
-                                .fill(.black)
-                                .frame(width: vm.closedNotchSize.width - 20)
-
-                            BoringBatteryView(
-                                batteryWidth: 30,
-                                isCharging: batteryModel.isCharging,
-                                isInLowPowerMode: batteryModel.isInLowPowerMode,
-                                isPluggedIn: batteryModel.isPluggedIn,
-                                levelBattery: batteryModel.levelBattery,
-                                isForNotification: true
-                            )
-                            .frame(width: IslandCompact.sideWidth, alignment: .trailing)
-                            .padding(.trailing, IslandCompact.edgeInset)
-                        }
+                        // iPhone's charging island: the state on the left of
+                        // the camera, the charge on the right, in the same
+                        // compact geometry and fade as every other alert.
+                        IslandCompact(icon: batteryModel.isCharging || batteryModel.isPluggedIn
+                                          ? "battery.100percent.bolt" : "battery.25percent",
+                                      trailing: .tintedText(batteryModel.islandPercent, batteryModel.islandTint),
+                                      leadingText: batteryModel.islandLabel,
+                                      notchWidth: vm.closedNotchSize.width,
+                                      height: vm.effectiveClosedNotchHeight)
+                            .transition(.asymmetric(
+                                insertion: .identity,
+                                removal: .opacity.animation(.easeIn(duration: 0.08))))
                         .frame(height: vm.effectiveClosedNotchHeight, alignment: .center)
                       } else if coordinator.sneakPeek.show && Self.compactTypes.contains(coordinator.sneakPeek.type) && vm.notchState == .closed {
                           // Every short-lived alert uses the iPhone Dynamic

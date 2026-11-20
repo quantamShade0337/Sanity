@@ -42,6 +42,7 @@ enum GuideKey: String, CaseIterable {
     case diskReadWrite, otherDrives, gsProgress, nextStep, allSteps, moreOptions
     case openCleaner, quitAppShort, freeOfTotal, appColumn, evOff, evSaved
     case backgroundProcesses, percentFull
+    case batteryCharging, batteryCharged, batteryNotCharging, batteryLowPower
     // Page summaries
     case sumGeneral, sumFeatures, sumEnergy, sumMonitor, sumMouse, sumSwitcher, sumWindowLayout
     case sumAutoQuit, sumQuitProtection, sumClipboard, sumCutPaste, sumShelf, sumMedia
@@ -202,6 +203,10 @@ extension GuideStrings {
         .evSaved: "Saved",
         .backgroundProcesses: "Background processes",
         .percentFull: "%@ full",
+        .batteryCharging: "Charging",
+        .batteryCharged: "Charged",
+        .batteryNotCharging: "Not Charging",
+        .batteryLowPower: "Low Power",
         .sumGeneral: "Basic options: start Sanity when you log in, change the language and appearance, and choose what the menu bar icon shows.",
         .sumFeatures: "Turn whole features on or off. Anything you switch off here disappears from Sanity completely, so start small and add more later.",
         .sumEnergy: "Keep your Mac awake, change screen brightness, and control what happens to Bluetooth when your Mac sleeps.",

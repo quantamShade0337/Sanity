@@ -70,7 +70,15 @@ final class DashboardSnapshotTests: XCTestCase {
             ("cup.and.heat.waves.fill", .text(GuideText.t(.on, .enUS)), true),
             ("doc.on.clipboard.fill", .text(GuideText.t(.evCopied, .enUS)), true),
             ("camera.viewfinder", .text(GuideText.t(.evSaved, .enUS)), true),
-            ("airpods", .text("AirPods Pro"), true),
+            ("airpodspro", .batteryRing(0.72), true),
+            ("hifispeaker.fill", .text("MacBook Air Speakers"), true),
+        ]
+        let battery: [(String, String, Color)] = [
+            (GuideText.t(.batteryCharging, .enUS), "72%", .green),
+            (GuideText.t(.batteryCharged, .enUS), "100%", .green),
+            (GuideText.t(.batteryNotCharging, .enUS), "80%", .green),
+            (GuideText.t(.batteryLowPower, .enUS), "18%", .yellow),
+            (GuideText.t(.batteryLowPower, .ru), "18%", .yellow),
         ]
         let island = VStack(spacing: 14) {
             ForEach(Array(events.enumerated()), id: \.offset) { _, event in
@@ -79,11 +87,17 @@ final class DashboardSnapshotTests: XCTestCase {
                     .background(Color.black, in: UnevenRoundedRectangle(
                         bottomLeadingRadius: 12, bottomTrailingRadius: 12))
             }
+            ForEach(Array(battery.enumerated()), id: \.offset) { _, item in
+                IslandCompact(icon: "battery.100percent", trailing: .tintedText(item.1, item.2),
+                              leadingText: item.0, notchWidth: 185, height: 32)
+                    .background(Color.black, in: UnevenRoundedRectangle(
+                        bottomLeadingRadius: 12, bottomTrailingRadius: 12))
+            }
         }
         .padding(30)
-        .frame(width: 520, height: 470)
+        .frame(width: 560, height: 740)
         .background(Color(white: 0.85))
-        try render(island, name: "island", appearance: .aqua, size: NSSize(width: 520, height: 470), settle: 0.5)
+        try render(island, name: "island", appearance: .aqua, size: NSSize(width: 560, height: 740), settle: 1)
     }
 
     func testRenderOnboarding() throws {

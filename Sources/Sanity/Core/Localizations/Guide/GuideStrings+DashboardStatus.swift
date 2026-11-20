@@ -8,6 +8,10 @@ import Foundation
 extension GuideStrings {
     static let dashboardStatus: [AppLanguage: [GuideKey: String]] = [
         .de: [
+            .batteryCharging: "Wird geladen",
+            .batteryCharged: "Geladen",
+            .batteryNotCharging: "Lädt nicht",
+            .batteryLowPower: "Stromsparen",
             .backgroundProcesses: "Hintergrundprozesse",
             .percentFull: "%@ belegt",
             .evOff: "Aus",
@@ -49,6 +53,10 @@ extension GuideStrings {
             .quitAppShort: "Beenden",
         ],
         .fr: [
+            .batteryCharging: "En charge",
+            .batteryCharged: "Chargé",
+            .batteryNotCharging: "Pas en charge",
+            .batteryLowPower: "Économie",
             .backgroundProcesses: "Processus en arrière-plan",
             .percentFull: "%@ utilisés",
             .evOff: "Désactivé",
@@ -90,6 +98,10 @@ extension GuideStrings {
             .quitAppShort: "Quitter",
         ],
         .es: [
+            .batteryCharging: "Cargando",
+            .batteryCharged: "Cargado",
+            .batteryNotCharging: "Sin cargar",
+            .batteryLowPower: "Bajo consumo",
             .backgroundProcesses: "Procesos en segundo plano",
             .percentFull: "%@ ocupado",
             .evOff: "Desactivado",
@@ -131,6 +143,10 @@ extension GuideStrings {
             .quitAppShort: "Salir",
         ],
         .it: [
+            .batteryCharging: "In carica",
+            .batteryCharged: "Carico",
+            .batteryNotCharging: "Non in carica",
+            .batteryLowPower: "Risparmio",
             .backgroundProcesses: "Processi in background",
             .percentFull: "%@ occupato",
             .evOff: "Spento",
@@ -172,6 +188,10 @@ extension GuideStrings {
             .quitAppShort: "Esci",
         ],
         .ptBR: [
+            .batteryCharging: "Carregando",
+            .batteryCharged: "Carregado",
+            .batteryNotCharging: "Sem carregar",
+            .batteryLowPower: "Pouca energia",
             .backgroundProcesses: "Processos em segundo plano",
             .percentFull: "%@ ocupado",
             .evOff: "Desligado",
@@ -213,6 +233,10 @@ extension GuideStrings {
             .quitAppShort: "Encerrar",
         ],
         .tr: [
+            .batteryCharging: "Şarj oluyor",
+            .batteryCharged: "Şarj oldu",
+            .batteryNotCharging: "Şarj olmuyor",
+            .batteryLowPower: "Düşük güç",
             .backgroundProcesses: "Arka plan işlemleri",
             .percentFull: "%@ dolu",
             .evOff: "Kapalı",
@@ -254,6 +278,10 @@ extension GuideStrings {
             .quitAppShort: "Çık",
         ],
         .ru: [
+            .batteryCharging: "Заряжается",
+            .batteryCharged: "Заряжен",
+            .batteryNotCharging: "Не заряжается",
+            .batteryLowPower: "Энергосбер.",
             .backgroundProcesses: "Фоновые процессы",
             .percentFull: "занято %@",
             .evOff: "Выкл.",
@@ -295,6 +323,10 @@ extension GuideStrings {
             .quitAppShort: "Завершить",
         ],
         .ja: [
+            .batteryCharging: "充電中",
+            .batteryCharged: "充電完了",
+            .batteryNotCharging: "充電停止中",
+            .batteryLowPower: "低電力",
             .backgroundProcesses: "バックグラウンドプロセス",
             .percentFull: "%@ 使用中",
             .evOff: "オフ",
@@ -336,6 +368,10 @@ extension GuideStrings {
             .quitAppShort: "終了",
         ],
         .ko: [
+            .batteryCharging: "충전 중",
+            .batteryCharged: "충전됨",
+            .batteryNotCharging: "충전 안 함",
+            .batteryLowPower: "저전력",
             .backgroundProcesses: "백그라운드 프로세스",
             .percentFull: "%@ 사용 중",
             .evOff: "끔",
@@ -377,6 +413,10 @@ extension GuideStrings {
             .quitAppShort: "종료",
         ],
         .zhHans: [
+            .batteryCharging: "正在充电",
+            .batteryCharged: "已充满",
+            .batteryNotCharging: "未在充电",
+            .batteryLowPower: "低电量",
             .backgroundProcesses: "后台进程",
             .percentFull: "已用 %@",
             .evOff: "关闭",
@@ -418,6 +458,10 @@ extension GuideStrings {
             .quitAppShort: "退出",
         ],
         .zhTW: [
+            .batteryCharging: "充電中",
+            .batteryCharged: "已充飽",
+            .batteryNotCharging: "未在充電",
+            .batteryLowPower: "低耗電",
             .backgroundProcesses: "背景程序",
             .percentFull: "已使用 %@",
             .evOff: "關閉",

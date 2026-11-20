@@ -33,6 +33,14 @@ enum GuideKey: String, CaseIterable {
     case notchSubtitle, notchEventsSection, notchEventsCaption
     case notchEventKeepAwake, notchEventCopied, notchEventCapture, notchEventOutput
     case evKeepAwakeOn, evKeepAwakeOff, evCopied, evScreenshot, evRecording
+    // Dashboard v2
+    case processor, statusGood, statusGoodDetail, statusBusy, statusBusyDetail
+    case statusMemory, statusMemoryDetail, statusDisk, statusDiskDetail
+    case statusBattery, statusBatteryDetail, statusHot, statusHotDetail
+    case loadLight, loadModerate, loadHeavy, memRoomy, memTight, memLow
+    case free, activity, activityCaption, whatsUsing, moreDetails, graphics
+    case diskReadWrite, otherDrives, gsProgress, nextStep, allSteps, moreOptions
+    case openCleaner, quitAppShort
     // Page summaries
     case sumGeneral, sumFeatures, sumEnergy, sumMonitor, sumMouse, sumSwitcher, sumWindowLayout
     case sumAutoQuit, sumQuitProtection, sumClipboard, sumCutPaste, sumShelf, sumMedia
@@ -43,6 +51,11 @@ enum GuideKey: String, CaseIterable {
 
 enum GuideText {
     static func table(_ language: AppLanguage) -> [GuideKey: String] {
+        let extra = GuideStrings.dashboardStatus[language == .zhHK ? .zhTW : language] ?? [:]
+        return baseTable(language).merging(extra) { base, _ in base }
+    }
+
+    private static func baseTable(_ language: AppLanguage) -> [GuideKey: String] {
         switch language {
         case .enUS: return GuideStrings.enUS
         case .ptBR: return GuideStrings.ptBR
@@ -149,6 +162,39 @@ extension GuideStrings {
         .evCopied: "Copied",
         .evScreenshot: "Screenshot saved",
         .evRecording: "Recording saved",
+        .processor: "Processor",
+        .statusGood: "Your Mac is running smoothly",
+        .statusGoodDetail: "Nothing needs your attention right now.",
+        .statusBusy: "Your Mac is working hard",
+        .statusBusyDetail: "The processor is at %@. See what's using it below.",
+        .statusMemory: "Memory is running low",
+        .statusMemoryDetail: "Quitting apps you aren't using will free some up.",
+        .statusDisk: "Your disk is almost full",
+        .statusDiskDetail: "Only %@ left. The Cleaner can free up space.",
+        .statusBattery: "Battery is low",
+        .statusBatteryDetail: "%@ left. Plug in soon.",
+        .statusHot: "Your Mac is running hot",
+        .statusHotDetail: "The processor is at %@.",
+        .loadLight: "Light load",
+        .loadModerate: "Moderate load",
+        .loadHeavy: "Heavy load",
+        .memRoomy: "Plenty of room",
+        .memTight: "Getting full",
+        .memLow: "Running low",
+        .free: "free",
+        .activity: "Activity",
+        .activityCaption: "Processor and memory use over the last few minutes",
+        .whatsUsing: "What's using your Mac",
+        .moreDetails: "More details",
+        .graphics: "Graphics (GPU)",
+        .diskReadWrite: "Reading %@ · Writing %@",
+        .otherDrives: "Other drives",
+        .gsProgress: "%@ of %@ done",
+        .nextStep: "Next",
+        .allSteps: "All steps",
+        .moreOptions: "More options",
+        .openCleaner: "Open Cleaner",
+        .quitAppShort: "Quit",
         .sumGeneral: "Basic options: start Sanity when you log in, change the language and appearance, and choose what the menu bar icon shows.",
         .sumFeatures: "Turn whole features on or off. Anything you switch off here disappears from Sanity completely, so start small and add more later.",
         .sumEnergy: "Keep your Mac awake, change screen brightness, and control what happens to Bluetooth when your Mac sleeps.",

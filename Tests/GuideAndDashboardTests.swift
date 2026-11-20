@@ -70,17 +70,55 @@ final class SettingsPageGuideTests: XCTestCase {
 
 final class DashboardCardTests: XCTestCase {
     func testHiddenCardsRoundTrip() {
-        let cards: Set<DashboardCard> = [.gpu, .alerts, .storage]
+        let cards: Set<DashboardCard> = [.activity, .alerts, .details]
         XCTAssertEqual(DashboardCard.decodeHidden(DashboardCard.encodeHidden(cards)), cards)
     }
 
     func testDecodingIgnoresUnknownAndEmptyValues() {
         XCTAssertEqual(DashboardCard.decodeHidden(""), [])
-        XCTAssertEqual(DashboardCard.decodeHidden("cpu,,banana,network"), [.cpu, .network])
+        XCTAssertEqual(DashboardCard.decodeHidden("vitals,,banana,details"), [.vitals, .details])
     }
 
     func testEncodingIsStable() {
-        XCTAssertEqual(DashboardCard.encodeHidden([.network, .cpu]), "cpu,network")
+        XCTAssertEqual(DashboardCard.encodeHidden([.processes, .activity]), "activity,processes")
+    }
+}
+
+final class DashboardStatusTests: XCTestCase {
+    private func evaluate(cpu: Double? = 0.2, temp: Double? = 50, pressure: MemoryPressure = .normal,
+                          free: UInt64? = 500_000_000_000, total: UInt64? = 1_000_000_000_000,
+                          battery: PowerReading? = nil) -> DashboardStatus {
+        DashboardStatus.evaluate(cpu: cpu, cpuTemperature: temp, pressure: pressure,
+                                 mainDiskFree: free, mainDiskTotal: total, battery: battery,
+                                 formatTemperature: { "\($0)" })
+    }
+
+    func testHealthyMacIsGood() {
+        XCTAssertEqual(evaluate().level, .good)
+        XCTAssertEqual(evaluate().title, .statusGood)
+    }
+
+    func testAlmostFullDiskOffersTheCleaner() {
+        let status = evaluate(free: 5_000_000_000)
+        XCTAssertEqual(status.title, .statusDisk)
+        XCTAssertEqual(status.action, .cleaner)
+    }
+
+    func testWorstProblemWins() {
+        // A full disk outranks a busy processor and memory pressure.
+        XCTAssertEqual(evaluate(cpu: 0.95, pressure: .warning, free: 1_000_000_000).title, .statusDisk)
+        XCTAssertEqual(evaluate(cpu: 0.95, pressure: .warning).title, .statusMemory)
+        XCTAssertEqual(evaluate(cpu: 0.95).title, .statusBusy)
+        XCTAssertEqual(evaluate(temp: 99).title, .statusHot)
+    }
+
+    func testLowBatteryOnlyWhenUnplugged() {
+        var battery = PowerReading()
+        battery.hasBattery = true
+        battery.chargePercent = 10
+        XCTAssertEqual(evaluate(battery: battery).title, .statusBattery)
+        battery.isCharging = true
+        XCTAssertEqual(evaluate(battery: battery).title, .statusGood)
     }
 }
 

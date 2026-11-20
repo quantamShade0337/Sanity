@@ -1168,7 +1168,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSW
     }
 
     @objc private func menuOpenSanity() {
-        SettingsRouter.shared.page = .features
+        SettingsRouter.shared.page = .dashboard
+        openSettingsWindow()
+    }
+
+    /// `sanity://<page>` opens the Sanity window on that page, e.g.
+    /// `sanity://dashboard`, `sanity://notch`, `sanity://clipboard`.
+    /// An empty or unknown page opens the Dashboard.
+    func application(_ application: NSApplication, open urls: [URL]) {
+        guard let url = urls.first(where: { $0.scheme?.lowercased() == "sanity" }) else { return }
+        SettingsRouter.shared.request(FeatureSettingsDestination(SettingsPage.fromURLName(url.host ?? "")))
         openSettingsWindow()
     }
 

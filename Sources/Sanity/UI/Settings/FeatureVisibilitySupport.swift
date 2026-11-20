@@ -12,6 +12,14 @@ enum SettingsPage: Hashable, CaseIterable {
     case shortcuts, advanced, about, releaseNotes, support
 }
 
+extension SettingsPage {
+    /// The page named in a `sanity://` link: its case name, any case.
+    static func fromURLName(_ name: String) -> SettingsPage {
+        let wanted = name.lowercased()
+        return allCases.first { String(describing: $0).lowercased() == wanted } ?? .dashboard
+    }
+}
+
 /// Stable, non-localized identities for destinations inside shared Settings
 /// pages. Raw values may be persisted or used by UI identifiers, so cases can
 /// be added but should not be renamed.

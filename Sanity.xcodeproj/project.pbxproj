@@ -1,0 +1,809 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0913F15CD0598B09D53FD1D6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = FD7E6113FA4B379F6B29EF74 /* InfoPlist.strings */; };
+		0DBD1AFF27CACB2CB44743D2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = AD05E1C46B6EA692DA543DCF /* InfoPlist.strings */; };
+		2608867306602C7B35C53534 /* discord-symbol.svg in Resources */ = {isa = PBXBuildFile; fileRef = 02ABE9CF84AC0C010D8BDEDA /* discord-symbol.svg */; };
+		367E932FDDF655389E05ACA9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = AC603456E468C6B8BF3D7240 /* InfoPlist.strings */; };
+		3CA32E6900C2F1394973CDB6 /* highlights-mousebuttons.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 0C62B4B51315E84139132086 /* highlights-mousebuttons.jpg */; };
+		416E97F8D0073829AD777D63 /* MenuBarIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 07D12889B951EFE3B34C6241 /* MenuBarIcon@2x.png */; };
+		4200AE0DE9C22210CD27BB84 /* now-playing.pl in Resources */ = {isa = PBXBuildFile; fileRef = BA951CAF7C9E400AF06F78DA /* now-playing.pl */; };
+		46BFEDD44FE9BFAC4412D67F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7E3F30EB0841B3348205F850 /* InfoPlist.strings */; };
+		48DEEA4360120E4F22EF3136 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 774D09F3DF6F8061A7A75BDE /* InfoPlist.strings */; };
+		4C7148F9847AF794AB1FEDCC /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 168D5E4775DD3D900A01BA64 /* CHANGELOG.md */; };
+		5BF2150DED4FA2A0AD36C270 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 43AD0591CDE7B7F7F63650E2 /* InfoPlist.strings */; };
+		6C1E95CA471AD6FA59A52EFC /* highlights-clipboard.png in Resources */ = {isa = PBXBuildFile; fileRef = 59F192ECBE38FB351EB5209D /* highlights-clipboard.png */; };
+		71EBF6815F73BE9437687AC3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 05E7B80C6507A8FE4BE78648 /* InfoPlist.strings */; };
+		7D488F109A87189B9F67DEE1 /* highlights-capture.png in Resources */ = {isa = PBXBuildFile; fileRef = EB9BEF138CBF268681204C84 /* highlights-capture.png */; };
+		7DF40324679213C7FB442CD5 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 89CA69777162A4E426CEC23F /* InfoPlist.strings */; };
+		8BF87BEBFA4DA9AFBDE58288 /* highlights-snippetlibrary.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 3EB5824C7A51EE2F38BA5ABA /* highlights-snippetlibrary.jpg */; };
+		8DA655A0BCE4EBF41C1F8627 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E0EA91FF9980998BBD145386 /* InfoPlist.strings */; };
+		8E7FF6B64271563013B30AF2 /* BrandMark.png in Resources */ = {isa = PBXBuildFile; fileRef = F53F446462232BD04F692555 /* BrandMark.png */; };
+		A10000000000000000000001 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = C10000000000000000000001 /* LaunchAtLogin */; };
+		A10000000000000000000002 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = C10000000000000000000002 /* Sparkle */; };
+		A10000000000000000000003 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = C10000000000000000000003 /* KeyboardShortcuts */; };
+		A10000000000000000000004 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = C10000000000000000000004 /* Defaults */; };
+		A10000000000000000000005 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = C10000000000000000000005 /* SwiftUIIntrospect */; };
+		A10000000000000000000006 /* SkyLightWindow in Frameworks */ = {isa = PBXBuildFile; productRef = C10000000000000000000006 /* SkyLightWindow */; };
+		A10000000000000000000007 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = C10000000000000000000007 /* Lottie */; };
+		A10000000000000000000008 /* AsyncXPCConnection in Frameworks */ = {isa = PBXBuildFile; productRef = C10000000000000000000008 /* AsyncXPCConnection */; };
+		A10000000000000000000009 /* MacroVisionKit in Frameworks */ = {isa = PBXBuildFile; productRef = C10000000000000000000009 /* MacroVisionKit */; };
+		B9FBA075C729B7B272339087 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 25CA84AADD114873E0099DD3 /* Assets.xcassets */; };
+		BF5F57687706FDC24B453A78 /* com.ethansoh.Sanity.fan-control.plist in Resources */ = {isa = PBXBuildFile; fileRef = CB071FDD83175CF238B9A211 /* com.ethansoh.Sanity.fan-control.plist */; };
+		C78338658B534D6395A1BD6A /* highlights-superkey.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 437556E2921B186C82D4025B /* highlights-superkey.jpg */; };
+		CA014D30EBD4AAF53917AC81 /* MenuBarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 5817A52C7451292D2C2AC9CD /* MenuBarIcon.png */; };
+		CA58A87837BB3E081C781EF9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 577A880DF0078EA4C7FC73BB /* InfoPlist.strings */; };
+		CAD1DE8629C84180F65AE79B /* commandBar.gif in Resources */ = {isa = PBXBuildFile; fileRef = 22775EE27AFA0B60CBDC8EBD /* commandBar.gif */; };
+		DCB1226F40A8498C480DEDF0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 855742E1A975F252FC5DE0E7 /* InfoPlist.strings */; };
+		DD6A6024DCC0DE8BA4DFC56A /* menu-bar-temperature-metrics.png in Resources */ = {isa = PBXBuildFile; fileRef = 91D823D060E82DC4EBB3839A /* menu-bar-temperature-metrics.png */; };
+		F2599FD9553B8AA931586A1E /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4BE20E0BF685808FF599C99F /* AppIcon.icns */; };
+		F53080A7793873525A282520 /* highlights-appupdates.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4CC03E774418C34092C34927 /* highlights-appupdates.jpg */; };
+		FD51E4E819D01C3494BF8FA8 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7090B7D34E5B6255DAD9CBED /* InfoPlist.strings */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		81A9C9685B0952B4FB06A8C7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6682B104FABA168F693061E6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F47B90DF5E55C122B41ACD6E;
+			remoteInfo = Sanity;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		02ABE9CF84AC0C010D8BDEDA /* discord-symbol.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = "discord-symbol.svg"; sourceTree = "<group>"; };
+		05E7B80C6507A8FE4BE78648 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = "zh-TW.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		07D12889B951EFE3B34C6241 /* MenuBarIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuBarIcon@2x.png"; sourceTree = "<group>"; };
+		08C6E9D25CEFB3C4C1AD52C6 /* Sanity.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sanity.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C62B4B51315E84139132086 /* highlights-mousebuttons.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "highlights-mousebuttons.jpg"; sourceTree = "<group>"; };
+		168D5E4775DD3D900A01BA64 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
+		22775EE27AFA0B60CBDC8EBD /* commandBar.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = commandBar.gif; sourceTree = "<group>"; };
+		25CA84AADD114873E0099DD3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3EB5824C7A51EE2F38BA5ABA /* highlights-snippetlibrary.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "highlights-snippetlibrary.jpg"; sourceTree = "<group>"; };
+		437556E2921B186C82D4025B /* highlights-superkey.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "highlights-superkey.jpg"; sourceTree = "<group>"; };
+		43AD0591CDE7B7F7F63650E2 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = "zh-HK.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		4BE20E0BF685808FF599C99F /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
+		4CC03E774418C34092C34927 /* highlights-appupdates.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "highlights-appupdates.jpg"; sourceTree = "<group>"; };
+		577A880DF0078EA4C7FC73BB /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		5817A52C7451292D2C2AC9CD /* MenuBarIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MenuBarIcon.png; sourceTree = "<group>"; };
+		59F192ECBE38FB351EB5209D /* highlights-clipboard.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "highlights-clipboard.png"; sourceTree = "<group>"; };
+		7090B7D34E5B6255DAD9CBED /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		774D09F3DF6F8061A7A75BDE /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		7E3F30EB0841B3348205F850 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		855742E1A975F252FC5DE0E7 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		89CA69777162A4E426CEC23F /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = it.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		91D823D060E82DC4EBB3839A /* menu-bar-temperature-metrics.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-bar-temperature-metrics.png"; sourceTree = "<group>"; };
+		9C72C5DDD7AD00D2031EBD32 /* SanityTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SanityTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC603456E468C6B8BF3D7240 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		AD05E1C46B6EA692DA543DCF /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = "pt-BR.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		BA951CAF7C9E400AF06F78DA /* now-playing.pl */ = {isa = PBXFileReference; lastKnownFileType = text.script.perl; path = "now-playing.pl"; sourceTree = "<group>"; };
+		CB071FDD83175CF238B9A211 /* com.ethansoh.Sanity.fan-control.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "com.ethansoh.Sanity.fan-control.plist"; sourceTree = "<group>"; };
+		E0EA91FF9980998BBD145386 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		EB9BEF138CBF268681204C84 /* highlights-capture.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "highlights-capture.png"; sourceTree = "<group>"; };
+		F53F446462232BD04F692555 /* BrandMark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BrandMark.png; sourceTree = "<group>"; };
+		FD7E6113FA4B379F6B29EF74 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		5EF9A81603CA1EA5EC9AA9E3 /* Exceptions for "Tests" folder in "SanityTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 885B6DC1D55B5B21C9B6DC52 /* SanityTests */;
+		};
+		BA232150B66DA5BD20B3071C /* Exceptions for "Sources" folder in "Sanity" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = F47B90DF5E55C122B41ACD6E /* Sanity */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		4A4C714F97C8867AEA20DBCF /* Tests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				5EF9A81603CA1EA5EC9AA9E3 /* Exceptions for "Tests" folder in "SanityTests" target */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		AB556159AD3AEE66A30649B4 /* Sources */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BA232150B66DA5BD20B3071C /* Exceptions for "Sources" folder in "Sanity" target */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D10000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000001 /* LaunchAtLogin in Frameworks */,
+				A10000000000000000000002 /* Sparkle in Frameworks */,
+				A10000000000000000000003 /* KeyboardShortcuts in Frameworks */,
+				A10000000000000000000004 /* Defaults in Frameworks */,
+				A10000000000000000000005 /* SwiftUIIntrospect in Frameworks */,
+				A10000000000000000000006 /* SkyLightWindow in Frameworks */,
+				A10000000000000000000007 /* Lottie in Frameworks */,
+				A10000000000000000000008 /* AsyncXPCConnection in Frameworks */,
+				A10000000000000000000009 /* MacroVisionKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		37648E41F7BDC99CF17EAFC0 = {
+			isa = PBXGroup;
+			children = (
+				B55395BAD44C1CB8262F3902 /* Resources */,
+				AB556159AD3AEE66A30649B4 /* Sources */,
+				4A4C714F97C8867AEA20DBCF /* Tests */,
+				46E6D13208EB7ADE4863D632 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		388917A0449D6020EC86A5C1 /* Gifs */ = {
+			isa = PBXGroup;
+			children = (
+				22775EE27AFA0B60CBDC8EBD /* commandBar.gif */,
+			);
+			path = Gifs;
+			sourceTree = "<group>";
+		};
+		46E6D13208EB7ADE4863D632 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				08C6E9D25CEFB3C4C1AD52C6 /* Sanity.app */,
+				9C72C5DDD7AD00D2031EBD32 /* SanityTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B55395BAD44C1CB8262F3902 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				4BE20E0BF685808FF599C99F /* AppIcon.icns */,
+				25CA84AADD114873E0099DD3 /* Assets.xcassets */,
+				F53F446462232BD04F692555 /* BrandMark.png */,
+				168D5E4775DD3D900A01BA64 /* CHANGELOG.md */,
+				CB071FDD83175CF238B9A211 /* com.ethansoh.Sanity.fan-control.plist */,
+				577A880DF0078EA4C7FC73BB /* InfoPlist.strings */,
+				FD7E6113FA4B379F6B29EF74 /* InfoPlist.strings */,
+				855742E1A975F252FC5DE0E7 /* InfoPlist.strings */,
+				89CA69777162A4E426CEC23F /* InfoPlist.strings */,
+				7090B7D34E5B6255DAD9CBED /* InfoPlist.strings */,
+				AC603456E468C6B8BF3D7240 /* InfoPlist.strings */,
+				AD05E1C46B6EA692DA543DCF /* InfoPlist.strings */,
+				7E3F30EB0841B3348205F850 /* InfoPlist.strings */,
+				774D09F3DF6F8061A7A75BDE /* InfoPlist.strings */,
+				E0EA91FF9980998BBD145386 /* InfoPlist.strings */,
+				43AD0591CDE7B7F7F63650E2 /* InfoPlist.strings */,
+				05E7B80C6507A8FE4BE78648 /* InfoPlist.strings */,
+				5817A52C7451292D2C2AC9CD /* MenuBarIcon.png */,
+				07D12889B951EFE3B34C6241 /* MenuBarIcon@2x.png */,
+				BA951CAF7C9E400AF06F78DA /* now-playing.pl */,
+				388917A0449D6020EC86A5C1 /* Gifs */,
+				F5FE969F6FBD2EB74ABDF834 /* Images */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		F5FE969F6FBD2EB74ABDF834 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				02ABE9CF84AC0C010D8BDEDA /* discord-symbol.svg */,
+				4CC03E774418C34092C34927 /* highlights-appupdates.jpg */,
+				EB9BEF138CBF268681204C84 /* highlights-capture.png */,
+				59F192ECBE38FB351EB5209D /* highlights-clipboard.png */,
+				0C62B4B51315E84139132086 /* highlights-mousebuttons.jpg */,
+				3EB5824C7A51EE2F38BA5ABA /* highlights-snippetlibrary.jpg */,
+				437556E2921B186C82D4025B /* highlights-superkey.jpg */,
+				91D823D060E82DC4EBB3839A /* menu-bar-temperature-metrics.png */,
+			);
+			path = Images;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		885B6DC1D55B5B21C9B6DC52 /* SanityTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F9D932B373145169A6D30E3B /* Build configuration list for PBXNativeTarget "SanityTests" */;
+			buildPhases = (
+				90E4F8C3C2165A1C9061528C /* Sources */,
+				9A292D2FB93F57506E39384D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				75313E045820DF4B64BCF960 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				4A4C714F97C8867AEA20DBCF /* Tests */,
+			);
+			name = SanityTests;
+			packageProductDependencies = (
+			);
+			productName = SanityTests;
+			productReference = 9C72C5DDD7AD00D2031EBD32 /* SanityTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		F47B90DF5E55C122B41ACD6E /* Sanity */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A5CF0128423B2FBCA71EEC57 /* Build configuration list for PBXNativeTarget "Sanity" */;
+			buildPhases = (
+				75C774EABE6CDB0E177E877E /* Sources */,
+				D10000000000000000000001 /* Frameworks */,
+				B0B1F05F807A450F719B965C /* Resources */,
+				DF74228B69B4282ECB3AD2A5 /* Build bundled helpers */,
+				D20000000000000000000001 /* Embed Boring Notch media bridge */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AB556159AD3AEE66A30649B4 /* Sources */,
+			);
+			name = Sanity;
+			packageProductDependencies = (
+				C10000000000000000000001 /* LaunchAtLogin */,
+				C10000000000000000000002 /* Sparkle */,
+				C10000000000000000000003 /* KeyboardShortcuts */,
+				C10000000000000000000004 /* Defaults */,
+				C10000000000000000000005 /* SwiftUIIntrospect */,
+				C10000000000000000000006 /* SkyLightWindow */,
+				C10000000000000000000007 /* Lottie */,
+				C10000000000000000000008 /* AsyncXPCConnection */,
+				C10000000000000000000009 /* MacroVisionKit */,
+			);
+			productName = Sanity;
+			productReference = 08C6E9D25CEFB3C4C1AD52C6 /* Sanity.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6682B104FABA168F693061E6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+			};
+			buildConfigurationList = ECB0343C571D7B3A8578AA5E /* Build configuration list for PBXProject "Sanity" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				de,
+				en,
+				es,
+				fr,
+				it,
+				ja,
+				ko,
+				"pt-BR",
+				ru,
+				tr,
+				"zh-HK",
+				"zh-Hans",
+				"zh-TW",
+			);
+			mainGroup = 37648E41F7BDC99CF17EAFC0;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B10000000000000000000001 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
+				B10000000000000000000002 /* XCRemoteSwiftPackageReference "Sparkle" */,
+				B10000000000000000000003 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				B10000000000000000000004 /* XCRemoteSwiftPackageReference "Defaults" */,
+				B10000000000000000000005 /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
+				B10000000000000000000006 /* XCRemoteSwiftPackageReference "SkyLightWindow" */,
+				B10000000000000000000007 /* XCRemoteSwiftPackageReference "lottie-spm" */,
+				B10000000000000000000008 /* XCRemoteSwiftPackageReference "AsyncXPCConnection" */,
+				B10000000000000000000009 /* XCRemoteSwiftPackageReference "MacroVisionKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 46E6D13208EB7ADE4863D632 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F47B90DF5E55C122B41ACD6E /* Sanity */,
+				885B6DC1D55B5B21C9B6DC52 /* SanityTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9A292D2FB93F57506E39384D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B0B1F05F807A450F719B965C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F2599FD9553B8AA931586A1E /* AppIcon.icns in Resources */,
+				B9FBA075C729B7B272339087 /* Assets.xcassets in Resources */,
+				8E7FF6B64271563013B30AF2 /* BrandMark.png in Resources */,
+				4C7148F9847AF794AB1FEDCC /* CHANGELOG.md in Resources */,
+				CA58A87837BB3E081C781EF9 /* InfoPlist.strings in Resources */,
+				8DA655A0BCE4EBF41C1F8627 /* InfoPlist.strings in Resources */,
+				FD51E4E819D01C3494BF8FA8 /* InfoPlist.strings in Resources */,
+				71EBF6815F73BE9437687AC3 /* InfoPlist.strings in Resources */,
+				5BF2150DED4FA2A0AD36C270 /* InfoPlist.strings in Resources */,
+				0913F15CD0598B09D53FD1D6 /* InfoPlist.strings in Resources */,
+				7DF40324679213C7FB442CD5 /* InfoPlist.strings in Resources */,
+				367E932FDDF655389E05ACA9 /* InfoPlist.strings in Resources */,
+				48DEEA4360120E4F22EF3136 /* InfoPlist.strings in Resources */,
+				0DBD1AFF27CACB2CB44743D2 /* InfoPlist.strings in Resources */,
+				46BFEDD44FE9BFAC4412D67F /* InfoPlist.strings in Resources */,
+				DCB1226F40A8498C480DEDF0 /* InfoPlist.strings in Resources */,
+				CA014D30EBD4AAF53917AC81 /* MenuBarIcon.png in Resources */,
+				416E97F8D0073829AD777D63 /* MenuBarIcon@2x.png in Resources */,
+				BF5F57687706FDC24B453A78 /* com.ethansoh.Sanity.fan-control.plist in Resources */,
+				CAD1DE8629C84180F65AE79B /* commandBar.gif in Resources */,
+				2608867306602C7B35C53534 /* discord-symbol.svg in Resources */,
+				F53080A7793873525A282520 /* highlights-appupdates.jpg in Resources */,
+				7D488F109A87189B9F67DEE1 /* highlights-capture.png in Resources */,
+				6C1E95CA471AD6FA59A52EFC /* highlights-clipboard.png in Resources */,
+				3CA32E6900C2F1394973CDB6 /* highlights-mousebuttons.jpg in Resources */,
+				8BF87BEBFA4DA9AFBDE58288 /* highlights-snippetlibrary.jpg in Resources */,
+				C78338658B534D6395A1BD6A /* highlights-superkey.jpg in Resources */,
+				DD6A6024DCC0DE8BA4DFC56A /* menu-bar-temperature-metrics.png in Resources */,
+				4200AE0DE9C22210CD27BB84 /* now-playing.pl in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		D20000000000000000000001 /* Embed Boring Notch media bridge */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Boring Notch media bridge";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\nAPP_CONTENTS=\"${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}\"\nFRAMEWORKS_DIR=\"${APP_CONTENTS}/Frameworks\"\nRESOURCE_DIR=\"${APP_CONTENTS}/Resources\"\nNOTCH_MEDIA_DIR=\"${PROJECT_DIR}/../boring.notch-main/mediaremote-adapter\"\nmkdir -p \"${FRAMEWORKS_DIR}\" \"${RESOURCE_DIR}\"\nrm -rf \"${FRAMEWORKS_DIR}/MediaRemoteAdapter.framework\"\nditto \"${NOTCH_MEDIA_DIR}/MediaRemoteAdapter.framework\" \"${FRAMEWORKS_DIR}/MediaRemoteAdapter.framework\"\ncp \"${NOTCH_MEDIA_DIR}/MediaRemoteAdapterTestClient\" \"${RESOURCE_DIR}/MediaRemoteAdapterTestClient\"\ncp \"${NOTCH_MEDIA_DIR}/mediaremote-adapter.pl\" \"${RESOURCE_DIR}/mediaremote-adapter.pl\"\nchmod +x \"${RESOURCE_DIR}/MediaRemoteAdapterTestClient\" \"${RESOURCE_DIR}/mediaremote-adapter.pl\"\n";
+		};
+		DF74228B69B4282ECB3AD2A5 /* Build bundled helpers */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build bundled helpers";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\nAPP_CONTENTS=\"${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}\"\nHELPER_DIR=\"${APP_CONTENTS}/Library/LaunchServices\"\nFRAMEWORKS_DIR=\"${APP_CONTENTS}/Frameworks\"\nSDK_PATH=\"$(xcrun --sdk macosx --show-sdk-path)\"\nmkdir -p \"${HELPER_DIR}\" \"${FRAMEWORKS_DIR}\"\nxcrun swiftc -O -target arm64-apple-macosx14.0 -sdk \"${SDK_PATH}\" \\\n  \"${PROJECT_DIR}/Sources/Sanity/Services/FanControl/FanControlSupport.swift\" \\\n  \"${PROJECT_DIR}/Sources/Sanity/Services/FanControl/FanControlXPC.swift\" \\\n  \"${PROJECT_DIR}/Sources/Sanity/Services/SystemMonitor/SMCClient.swift\" \\\n  \"${PROJECT_DIR}/Sources/Sanity/Services/Metrics/TemperatureSensorSelector.swift\" \\\n  \"${PROJECT_DIR}/Sources/Sanity/Services/FanControl/FanControlHardware.swift\" \\\n  \"${PROJECT_DIR}/Support/FanControlHelper/main.swift\" \\\n  -o \"${HELPER_DIR}/com.ethansoh.Sanity.fan-control\"\nxcrun swiftc -O -target arm64-apple-macosx14.0 -sdk \"${SDK_PATH}\" \\\n  -emit-library -module-name SanityNowPlaying \\\n  \"${PROJECT_DIR}/Support/NowPlayingAdapter/NowPlayingAdapter.swift\" \\\n  -o \"${FRAMEWORKS_DIR}/libSanityNowPlaying.dylib\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		75C774EABE6CDB0E177E877E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		90E4F8C3C2165A1C9061528C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		75313E045820DF4B64BCF960 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F47B90DF5E55C122B41ACD6E /* Sanity */;
+			targetProxy = 81A9C9685B0952B4FB06A8C7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		29DDEBB014E6FDC3C48F8C12 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		477B7042C629C8C49E7952D2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Configuration/Sanity.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 82;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = Sources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethansoh.Sanity;
+				PRODUCT_NAME = Sanity;
+				SDKROOT = macosx;
+				SWIFT_INCLUDE_PATHS = "$(PROJECT_DIR)/Support/HIDEventSystem $(PROJECT_DIR)/Support/VMStatisticsCompat";
+			};
+			name = Release;
+		};
+		5DBD0F03CF1938B9823F699D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Configuration/Sanity.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 82;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = Sources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethansoh.Sanity;
+				PRODUCT_NAME = Sanity;
+				SDKROOT = macosx;
+				SWIFT_INCLUDE_PATHS = "$(PROJECT_DIR)/Support/HIDEventSystem $(PROJECT_DIR)/Support/VMStatisticsCompat";
+			};
+			name = Debug;
+		};
+		8F7C7E4DB425475D7C1263AC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		E870642F2A41AFF3271FE2B3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethansoh.Sanity.Tests;
+				SDKROOT = macosx;
+				SWIFT_INCLUDE_PATHS = "$(PROJECT_DIR)/Support/HIDEventSystem $(PROJECT_DIR)/Support/VMStatisticsCompat";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Sanity.app/Contents/MacOS/Sanity";
+			};
+			name = Release;
+		};
+		ED64434C9C055FE59643926E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ethansoh.Sanity.Tests;
+				SDKROOT = macosx;
+				SWIFT_INCLUDE_PATHS = "$(PROJECT_DIR)/Support/HIDEventSystem $(PROJECT_DIR)/Support/VMStatisticsCompat";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Sanity.app/Contents/MacOS/Sanity";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A5CF0128423B2FBCA71EEC57 /* Build configuration list for PBXNativeTarget "Sanity" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5DBD0F03CF1938B9823F699D /* Debug */,
+				477B7042C629C8C49E7952D2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		ECB0343C571D7B3A8578AA5E /* Build configuration list for PBXProject "Sanity" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8F7C7E4DB425475D7C1263AC /* Debug */,
+				29DDEBB014E6FDC3C48F8C12 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F9D932B373145169A6D30E3B /* Build configuration list for PBXNativeTarget "SanityTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ED64434C9C055FE59643926E /* Debug */,
+				E870642F2A41AFF3271FE2B3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B10000000000000000000001 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
+		B10000000000000000000002 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = exactVersion;
+				version = 2.9.1;
+			};
+		};
+		B10000000000000000000003 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.4;
+			};
+		};
+		B10000000000000000000004 /* XCRemoteSwiftPackageReference "Defaults" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/Defaults";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.2;
+			};
+		};
+		B10000000000000000000005 /* XCRemoteSwiftPackageReference "swiftui-introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/swiftui-introspect";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
+		B10000000000000000000006 /* XCRemoteSwiftPackageReference "SkyLightWindow" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Lakr233/SkyLightWindow";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		B10000000000000000000007 /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-spm.git";
+			requirement = {
+				kind = exactVersion;
+				version = 4.5.2;
+			};
+		};
+		B10000000000000000000008 /* XCRemoteSwiftPackageReference "AsyncXPCConnection" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ChimeHQ/AsyncXPCConnection";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
+		B10000000000000000000009 /* XCRemoteSwiftPackageReference "MacroVisionKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/TheBoredTeam/MacroVisionKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C10000000000000000000001 /* LaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B10000000000000000000001 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
+			productName = LaunchAtLogin;
+		};
+		C10000000000000000000002 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B10000000000000000000002 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+		C10000000000000000000003 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B10000000000000000000003 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
+		C10000000000000000000004 /* Defaults */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B10000000000000000000004 /* XCRemoteSwiftPackageReference "Defaults" */;
+			productName = Defaults;
+		};
+		C10000000000000000000005 /* SwiftUIIntrospect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B10000000000000000000005 /* XCRemoteSwiftPackageReference "swiftui-introspect" */;
+			productName = SwiftUIIntrospect;
+		};
+		C10000000000000000000006 /* SkyLightWindow */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B10000000000000000000006 /* XCRemoteSwiftPackageReference "SkyLightWindow" */;
+			productName = SkyLightWindow;
+		};
+		C10000000000000000000007 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B10000000000000000000007 /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
+		};
+		C10000000000000000000008 /* AsyncXPCConnection */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B10000000000000000000008 /* XCRemoteSwiftPackageReference "AsyncXPCConnection" */;
+			productName = AsyncXPCConnection;
+		};
+		C10000000000000000000009 /* MacroVisionKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B10000000000000000000009 /* XCRemoteSwiftPackageReference "MacroVisionKit" */;
+			productName = MacroVisionKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 6682B104FABA168F693061E6 /* Project object */;
+}

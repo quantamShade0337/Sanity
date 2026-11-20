@@ -1,0 +1,128 @@
+name: Sanity
+options:
+  deploymentTarget:
+    macOS: 14.0
+settings:
+  base:
+    SWIFT_TREAT_WARNINGS_AS_ERRORS: NO
+    GCC_TREAT_WARNINGS_AS_ERRORS: NO
+    SWIFT_STRICT_CONCURRENCY: minimal
+    SWIFT_VERSION: 5.0
+
+packages:
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    exactVersion: 2.9.1
+  KeyboardShortcuts:
+    url: https://github.com/sindresorhus/KeyboardShortcuts
+    from: 2.2.4
+  Defaults:
+    url: https://github.com/sindresorhus/Defaults
+    from: 9.0.2
+  SwiftUIIntrospect:
+    url: https://github.com/siteline/swiftui-introspect
+    from: 1.3.0
+  SkyLightWindow:
+    url: https://github.com/Lakr233/SkyLightWindow
+    from: 1.0.0
+  Lottie:
+    url: https://github.com/airbnb/lottie-spm.git
+    exactVersion: 4.5.2
+  MacroVisionKit:
+    url: https://github.com/TheBoredTeam/MacroVisionKit
+    from: 0.2.0
+
+schemes:
+  Sanity:
+    shared: true
+    build:
+      targets:
+        Sanity: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - SanityTests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+
+targets:
+  Sanity:
+    type: application
+    platform: macOS
+    bundleId: com.ethansoh.Sanity
+    dependencies:
+      - package: Sparkle
+      - package: KeyboardShortcuts
+      - package: Defaults
+      - package: SwiftUIIntrospect
+      - package: SkyLightWindow
+      - package: Lottie
+      - package: MacroVisionKit
+    sources:
+      - path: Sources
+        type: syncedFolder
+      - path: Resources
+        buildPhase: resources
+    settings:
+      base:
+        INFOPLIST_FILE: Sources/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.ethansoh.Sanity
+        PRODUCT_NAME: Sanity
+        CODE_SIGN_ENTITLEMENTS: Configuration/Sanity.entitlements
+        ENABLE_APP_SANDBOX: NO
+        ENABLE_HARDENED_RUNTIME: YES
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+        SWIFT_INCLUDE_PATHS: "$(PROJECT_DIR)/Support/HIDEventSystem $(PROJECT_DIR)/Support/VMStatisticsCompat"
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        CURRENT_PROJECT_VERSION: 82
+        MARKETING_VERSION: 0.1.0
+    postBuildScripts:
+      - name: Build bundled helpers
+        basedOnDependencyAnalysis: false
+        script: |
+          set -euo pipefail
+          APP_CONTENTS="${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}"
+          HELPER_DIR="${APP_CONTENTS}/Library/LaunchServices"
+          FRAMEWORKS_DIR="${APP_CONTENTS}/Frameworks"
+          SDK_PATH="$(xcrun --sdk macosx --show-sdk-path)"
+          mkdir -p "${HELPER_DIR}" "${FRAMEWORKS_DIR}"
+          xcrun swiftc -O -target arm64-apple-macosx14.0 -sdk "${SDK_PATH}" \
+            "${PROJECT_DIR}/Sources/Sanity/Services/FanControl/FanControlSupport.swift" \
+            "${PROJECT_DIR}/Sources/Sanity/Services/FanControl/FanControlXPC.swift" \
+            "${PROJECT_DIR}/Sources/Sanity/Services/SystemMonitor/SMCClient.swift" \
+            "${PROJECT_DIR}/Sources/Sanity/Services/Metrics/TemperatureSensorSelector.swift" \
+            "${PROJECT_DIR}/Sources/Sanity/Services/FanControl/FanControlHardware.swift" \
+            "${PROJECT_DIR}/Support/FanControlHelper/main.swift" \
+            -o "${HELPER_DIR}/com.ethansoh.Sanity.fan-control"
+          xcrun swiftc -O -target arm64-apple-macosx14.0 -sdk "${SDK_PATH}" \
+            -emit-library -module-name SanityNowPlaying \
+            "${PROJECT_DIR}/Support/NowPlayingAdapter/NowPlayingAdapter.swift" \
+            -o "${FRAMEWORKS_DIR}/libSanityNowPlaying.dylib"
+          RESOURCE_DIR="${APP_CONTENTS}/Resources"
+          NOTCH_MEDIA_DIR="${PROJECT_DIR}/../boring.notch-main/mediaremote-adapter"
+          rm -rf "${FRAMEWORKS_DIR}/MediaRemoteAdapter.framework"
+          ditto "${NOTCH_MEDIA_DIR}/MediaRemoteAdapter.framework" "${FRAMEWORKS_DIR}/MediaRemoteAdapter.framework"
+          cp "${NOTCH_MEDIA_DIR}/MediaRemoteAdapterTestClient" "${RESOURCE_DIR}/MediaRemoteAdapterTestClient"
+          cp "${NOTCH_MEDIA_DIR}/mediaremote-adapter.pl" "${RESOURCE_DIR}/mediaremote-adapter.pl"
+          chmod +x "${RESOURCE_DIR}/MediaRemoteAdapterTestClient" "${RESOURCE_DIR}/mediaremote-adapter.pl"
+
+  SanityTests:
+    type: bundle.unit-test
+    platform: macOS
+    bundleId: com.ethansoh.Sanity.Tests
+    sources:
+      - path: Tests
+        type: syncedFolder
+    settings:
+      base:
+        INFOPLIST_FILE: Tests/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.ethansoh.Sanity.Tests
+        SWIFT_INCLUDE_PATHS: "$(PROJECT_DIR)/Support/HIDEventSystem $(PROJECT_DIR)/Support/VMStatisticsCompat"
+    dependencies:
+      - target: Sanity

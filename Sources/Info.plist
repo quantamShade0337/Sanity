@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>en</string>
+  <key>CFBundleAllowMixedLocalizations</key>
+  <true/>
+  <key>CFBundleDisplayName</key>
+  <string>Sanity</string>
+  <key>CFBundleExecutable</key>
+  <string>$(EXECUTABLE_NAME)</string>
+  <key>CFBundleIdentifier</key>
+  <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+  <key>CFBundleInfoDictionaryVersion</key>
+  <string>6.0</string>
+  <key>CFBundleName</key>
+  <string>Sanity</string>
+  <key>CFBundleIconFile</key>
+  <string>AppIcon</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleShortVersionString</key>
+  <string>$(MARKETING_VERSION)</string>
+  <key>CFBundleVersion</key>
+  <string>$(CURRENT_PROJECT_VERSION)</string>
+  <key>NSPrincipalClass</key>
+  <string>NSApplication</string>
+  <key>LSApplicationCategoryType</key>
+  <string>public.app-category.utilities</string>
+  <key>LSMinimumSystemVersion</key>
+  <string>14.0</string>
+  <key>LSUIElement</key>
+  <true/>
+  <key>NSAppleEventsUsageDescription</key>
+  <string>Sanity uses Automation to perform Finder and Terminal actions only when you request them.</string>
+  <key>NSAudioCaptureUsageDescription</key>
+  <string>Sanity processes application audio locally for per-app volume controls and recordings you start. Audio is never retained by the mixer.</string>
+  <key>NSBluetoothAlwaysUsageDescription</key>
+  <string>Sanity uses Bluetooth to read battery levels from connected peripherals.</string>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>Sanity records microphone audio only when you enable it for a screen recording.</string>
+  <key>NSCameraUsageDescription</key>
+  <string>Sanity accesses the camera only while its camera preview is open.</string>
+  <key>NSCalendarsFullAccessUsageDescription</key>
+  <string>Sanity shows events you choose inside the notch calendar.</string>
+  <key>NSRemindersFullAccessUsageDescription</key>
+  <string>Sanity shows and completes reminders you choose inside the notch calendar.</string>
+  <key>NSDownloadsFolderUsageDescription</key>
+  <string>Sanity accesses Downloads only for cleanup and organization actions you choose.</string>
+  <key>NSDesktopFolderUsageDescription</key>
+  <string>Sanity accesses the Desktop only when you choose it as a destination.</string>
+  <key>NSDocumentsFolderUsageDescription</key>
+  <string>Sanity accesses Documents only when you choose it as a destination.</string>
+  <key>NSNetworkVolumesUsageDescription</key>
+  <string>Sanity accesses network volumes only when you choose one for a file action.</string>
+  <key>NSRemovableVolumesUsageDescription</key>
+  <string>Sanity accesses removable volumes only when you choose one for a file action.</string>
+  <key>NSCameraUseContinuityCameraDeviceType</key>
+  <true/>
+  <key>NSHumanReadableCopyright</key>
+  <string>Sanity is derived from GPL-licensed Vorssaint code.</string>
+  <key>SanityFanControlHelperVersion</key>
+  <string>$(CURRENT_PROJECT_VERSION)</string>
+</dict>
+</plist>

@@ -42,6 +42,7 @@ final class NotchIntegration {
     private var observers: [AnyCancellable] = []
     private var outputListener: AudioObjectPropertyListenerBlock?
     private var lastOutputDevice: AudioDeviceID = 0
+    private let airPodsWatcher = AirPodsConnectionWatcher()
 
     private init() {
         // Sanity owns onboarding, so the embedded notch must never enter Boring
@@ -75,6 +76,7 @@ final class NotchIntegration {
         guard hasStarted else { return }
         observers.removeAll()
         stopObservingOutputDevice()
+        airPodsWatcher.stop()
         controller.applicationWillTerminate(notification)
         hasStarted = false
     }
@@ -146,6 +148,8 @@ final class NotchIntegration {
         }
 
         observeOutputDevice()
+        airPodsWatcher.onConnect = { [weak self] name in self?.showAirPods(outputName: name) }
+        airPodsWatcher.start()
     }
 
     // MARK: Default output device
@@ -165,14 +169,7 @@ final class NotchIntegration {
     }
 
     private static func deviceName(_ device: AudioDeviceID) -> String? {
-        var address = AudioObjectPropertyAddress(mSelector: kAudioObjectPropertyName,
-                                                 mScope: kAudioObjectPropertyScopeGlobal,
-                                                 mElement: kAudioObjectPropertyElementMain)
-        var name: Unmanaged<CFString>?
-        var size = UInt32(MemoryLayout<Unmanaged<CFString>?>.size)
-        let status = AudioObjectGetPropertyData(device, &address, 0, nil, &size, &name)
-        guard status == noErr, let name else { return nil }
-        return name.takeRetainedValue() as String
+        AirPodsConnectionWatcher.deviceName(device)
     }
 
     private func observeOutputDevice() {
@@ -201,7 +198,9 @@ final class NotchIntegration {
         lastOutputDevice = device
         guard let name = Self.deviceName(device) else { return }
         if AirPodsStatus.looksLikeAirPods(name) {
-            showAirPods(outputName: name)
+            // Shared with the connection watcher, so connecting and the
+            // sound switching over a moment later show one alert, not two.
+            airPodsWatcher.report(name)
             return
         }
         let lower = name.lowercased()

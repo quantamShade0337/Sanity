@@ -8,7 +8,7 @@ import SwiftUI
 /// on the iPhone Dynamic Island: the island keeps its height and widens
 /// sideways, with a glyph leading the camera and one small piece of
 /// information trailing it. Both sides get the same width so the camera
-/// stays centred. Silent mode, a Focus or AirPods connecting all work this
+/// stays centred, and that width is only what the content needs. Silent mode, a Focus or AirPods connecting all work this
 /// way on iPhone; nothing here drops below the camera or adds decoration.
 struct IslandCompact: View {
     enum Trailing: Equatable {
@@ -36,20 +36,65 @@ struct IslandCompact: View {
     let notchWidth: CGFloat
     let height: CGFloat
 
-    /// Compact regions are narrow on iPhone; long text truncates rather than
-    /// stretching the island.
-    static let sideWidth: CGFloat = 88
-    static let edgeInset: CGFloat = 14
+    /// The most a side may take. Each side is otherwise only as wide as the
+    /// wider of the two contents, so the island grows just enough to show
+    /// them, as on iPhone; text longer than this is replaced by a glyph.
+    static let maxSideWidth: CGFloat = 88
+    /// Breathing room between the content and the island's rounded ends,
+    /// on top of the closed notch's own corner padding.
+    static let edgeInset: CGFloat = 4
     /// Extra room on each side of the measured notch so nothing ever sits
     /// under the camera housing. The measured width already includes 4 pt.
     static let cameraClearance: CGFloat = 8
+    static let levelBarWidth: CGFloat = 44
+    static let ringSize: CGFloat = 18
 
     private static let labelFont = NSFont.systemFont(ofSize: 13, weight: .semibold)
 
     /// Whether a label fits its side at full size. Text is never clipped or
     /// shrunk: a label that doesn't fit is replaced by a glyph instead.
     static func fits(_ label: String) -> Bool {
-        (label as NSString).size(withAttributes: [.font: labelFont]).width <= sideWidth
+        textWidth(label) <= maxSideWidth
+    }
+
+    static func textWidth(_ label: String) -> CGFloat {
+        ceil((label as NSString).size(withAttributes: [.font: labelFont]).width) + 1
+    }
+
+    static func glyphWidth(_ name: String, pointSize: CGFloat = 14, weight: NSFont.Weight = .semibold) -> CGFloat {
+        let config = NSImage.SymbolConfiguration(pointSize: pointSize, weight: weight)
+        guard let image = NSImage(systemSymbolName: name, accessibilityDescription: nil)?
+            .withSymbolConfiguration(config) else { return 18 }
+        return ceil(image.size.width)
+    }
+
+    /// Width of what sits left of the camera.
+    var leadingContentWidth: CGFloat {
+        if let leadingText, Self.fits(leadingText) { return Self.textWidth(leadingText) }
+        return Self.glyphWidth(icon)
+    }
+
+    /// Width of what sits right of the camera. Percentages are measured at
+    /// "100%" so the island doesn't twitch as the number changes.
+    var trailingContentWidth: CGFloat {
+        switch trailing {
+        case .text(let label):
+            return Self.fits(label) ? Self.textWidth(label) : Self.glyphWidth("checkmark", pointSize: 13, weight: .bold)
+        case .level(_, let showsPercentage):
+            return showsPercentage ? Self.textWidth("100%") : Self.levelBarWidth
+        case .batteryRing:
+            return Self.ringSize
+        case .none:
+            return 0
+        case .tintedText(let label, _):
+            return max(Self.textWidth(label), Self.textWidth("100%"))
+        }
+    }
+
+    /// Both sides share one width so the camera stays centred: the wider
+    /// content's, never more.
+    var sideWidth: CGFloat {
+        min(Self.maxSideWidth, max(leadingContentWidth, trailingContentWidth, 16))
     }
 
     private var ink: Color { isActive ? .white : .white.opacity(0.55) }
@@ -78,7 +123,7 @@ struct IslandCompact: View {
                         .contentTransition(.symbolEffect(.replace))
                 }
             }
-            .frame(width: Self.sideWidth, height: height, alignment: .leading)
+            .frame(width: sideWidth, height: height, alignment: .leading)
             .padding(.leading, Self.edgeInset)
 
             Rectangle()
@@ -86,7 +131,7 @@ struct IslandCompact: View {
                 .frame(width: notchWidth + Self.cameraClearance, height: height)
 
             trailingView
-                .frame(width: Self.sideWidth, height: height, alignment: .trailing)
+                .frame(width: sideWidth, height: height, alignment: .trailing)
                 .padding(.trailing, Self.edgeInset)
         }
         .frame(height: height)
@@ -125,11 +170,11 @@ struct IslandCompact: View {
                     .contentTransition(.numericText())
             } else {
                 IslandLevelBar(value: value)
-                    .frame(width: 44, height: 5)
+                    .frame(width: Self.levelBarWidth, height: 5)
             }
         case .batteryRing(let charge):
             IslandBatteryRing(charge: charge)
-                .frame(width: 18, height: 18)
+                .frame(width: Self.ringSize, height: Self.ringSize)
         case .none:
             Color.clear
         case .tintedText(let label, let color):

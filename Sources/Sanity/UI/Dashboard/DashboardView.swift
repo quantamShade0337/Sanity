@@ -243,6 +243,17 @@ struct DashboardView: View {
         var help: String? = nil
     }
 
+    /// Memory moves within a few percent, so on a 0-100% scale its line sits
+    /// flat at the top and reads like a bar. Fit it to its recent range,
+    /// never narrower than 20 points, so real change shows but noise doesn't.
+    static func fittedHistory(_ values: [Double], minimumSpan: Double = 0.2) -> [Double] {
+        guard let low = values.min(), let high = values.max() else { return values }
+        let span = max(minimumSpan, (high - low) * 1.4)
+        let mid = (low + high) / 2
+        let floor = min(max(0, mid - span / 2), 1 - span)
+        return values.map { min(1, max(0, ($0 - floor) / span)) }
+    }
+
     /// Splits "552 GB" into ("552", "GB") and "43%" into ("43", "%"), so the
     /// unit can be set smaller than the figure.
     private static func split(_ formatted: String) -> (String, String) {
@@ -285,7 +296,7 @@ struct DashboardView: View {
             }
             items.append(Reading(id: "memory", label: t(.memory), number: number, unit: unit,
                                  caption: fraction == nil ? "" : t(word).capitalizedFirst,
-                                 graphic: .history(snapshot.memoryHistory),
+                                 graphic: .history(Self.fittedHistory(snapshot.memoryHistory)),
                                  severity: severity, help: amounts))
         }
         if features.isAvailable(.monitorDisk), let disk = mainDisk {
@@ -436,8 +447,9 @@ struct DashboardView: View {
     }
 
     /// Ordinary apps first, merged by name (helpers of one app report under
-    /// their responsible app's name); everything else becomes one
-    /// "Background processes" row so system daemons don't crowd the list.
+    /// their responsible app's name), then one "Everything else" row. That
+    /// row is the true remainder (total use minus the apps listed), not just
+    /// the daemons that happened to make the sampled top list.
     private var usageRows: [UsageRow] {
         let source = processSort == .cpu ? topCPU : topMemory
         var apps: [String: UsageRow] = [:]
@@ -458,9 +470,14 @@ struct DashboardView: View {
             }
         }
         var rows = order.compactMap { apps[$0] }.sorted { $0.value > $1.value }.prefix(5).map { $0 }
-        if background > 0 {
-            rows.append(UsageRow(id: "background", name: t(.backgroundProcesses), pid: nil,
-                                 value: background, app: nil))
+        let shown = rows.reduce(0) { $0 + $1.value }
+        let total: Double? = processSort == .cpu
+            ? snapshot.cpuUsage.map { $0 * 100 }
+            : snapshot.memoryUsed.map(Double.init)
+        let remainder = max(background, (total ?? 0) - shown)
+        if remainder > 0 {
+            rows.append(UsageRow(id: "background", name: t(.everythingElse), pid: nil,
+                                 value: remainder, app: nil))
         }
         return rows
     }

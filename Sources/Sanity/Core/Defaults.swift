@@ -674,20 +674,29 @@ enum SupportUpdateIntroStep: CaseIterable, Hashable {
     case social
     case support
 
-    var next: SupportUpdateIntroStep? {
+    /// Steps whose link is configured in AppInfo; support is always shown.
+    var isAvailable: Bool {
         switch self {
-        case .discord: return .social
-        case .social: return .support
-        case .support: return nil
+        case .discord: return AppInfo.discordURL != nil
+        case .social: return AppInfo.socialURL != nil
+        case .support: return true
         }
     }
 
+    static var first: SupportUpdateIntroStep {
+        allCases.first(where: \.isAvailable) ?? .support
+    }
+
+    var next: SupportUpdateIntroStep? {
+        let steps = Self.allCases.filter(\.isAvailable)
+        guard let index = steps.firstIndex(of: self), index + 1 < steps.count else { return nil }
+        return steps[index + 1]
+    }
+
     var previous: SupportUpdateIntroStep? {
-        switch self {
-        case .discord: return nil
-        case .social: return .discord
-        case .support: return .social
-        }
+        let steps = Self.allCases.filter(\.isAvailable)
+        guard let index = steps.firstIndex(of: self), index > 0 else { return nil }
+        return steps[index - 1]
     }
 }
 

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E0002D5BB2E028148585DF14 /* BrandMarkSmall.png in Resources */ = {isa = PBXBuildFile; fileRef = EB561956B5A7EE4AC9DA5FC1 /* BrandMarkSmall.png */; };
+		63EA7859B048D16C436FB51B /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = DF55693CDCA0562B5337C1CB /* AppIcon.icon */; };
 		0913F15CD0598B09D53FD1D6 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = FD7E6113FA4B379F6B29EF74 /* InfoPlist.strings */; };
 		0DBD1AFF27CACB2CB44743D2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = AD05E1C46B6EA692DA543DCF /* InfoPlist.strings */; };
 		2608867306602C7B35C53534 /* discord-symbol.svg in Resources */ = {isa = PBXBuildFile; fileRef = 02ABE9CF84AC0C010D8BDEDA /* discord-symbol.svg */; };
@@ -58,6 +60,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		EB561956B5A7EE4AC9DA5FC1 /* BrandMarkSmall.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BrandMarkSmall.png; sourceTree = "<group>"; };
+		DF55693CDCA0562B5337C1CB /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		02ABE9CF84AC0C010D8BDEDA /* discord-symbol.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = "discord-symbol.svg"; sourceTree = "<group>"; };
 		05E7B80C6507A8FE4BE78648 /* InfoPlist.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = InfoPlist.strings; path = "zh-TW.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		07D12889B951EFE3B34C6241 /* MenuBarIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MenuBarIcon@2x.png"; sourceTree = "<group>"; };
@@ -180,6 +184,8 @@
 				4BE20E0BF685808FF599C99F /* AppIcon.icns */,
 				25CA84AADD114873E0099DD3 /* Assets.xcassets */,
 				F53F446462232BD04F692555 /* BrandMark.png */,
+				EB561956B5A7EE4AC9DA5FC1 /* BrandMarkSmall.png */,
+				DF55693CDCA0562B5337C1CB /* AppIcon.icon */,
 				168D5E4775DD3D900A01BA64 /* CHANGELOG.md */,
 				CB071FDD83175CF238B9A211 /* com.ethansoh.Sanity.fan-control.plist */,
 				577A880DF0078EA4C7FC73BB /* InfoPlist.strings */,
@@ -343,6 +349,8 @@
 				F2599FD9553B8AA931586A1E /* AppIcon.icns in Resources */,
 				B9FBA075C729B7B272339087 /* Assets.xcassets in Resources */,
 				8E7FF6B64271563013B30AF2 /* BrandMark.png in Resources */,
+				E0002D5BB2E028148585DF14 /* BrandMarkSmall.png in Resources */,
+				63EA7859B048D16C436FB51B /* AppIcon.icon in Resources */,
 				4C7148F9847AF794AB1FEDCC /* CHANGELOG.md in Resources */,
 				CA58A87837BB3E081C781EF9 /* InfoPlist.strings in Resources */,
 				8DA655A0BCE4EBF41C1F8627 /* InfoPlist.strings in Resources */,

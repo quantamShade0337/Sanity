@@ -43,27 +43,53 @@ struct NotchSettingsView: View {
     }
 
     @State private var selectedSection = Section.general
+    @ObservedObject private var permissions = Permissions.shared
     @State private var accentColorUpdateTrigger = UUID()
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack(alignment: .center, spacing: 14) {
+            // Description, then every section visible at once as an icon
+            // segmented control (named on hover and for VoiceOver), instead
+            // of nine pages hidden behind a dropdown.
+            VStack(alignment: .leading, spacing: 12) {
                 Text(GuideText.t(.notchSubtitle))
                     .font(.system(size: 13))
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-                Spacer()
-                Picker("Section", selection: $selectedSection) {
-                    ForEach(Section.allCases) { section in
-                        Label(section.rawValue, systemImage: section.icon).tag(section)
+                // Without Accessibility the system-HUD replacement switches
+                // itself off, so say why the volume alerts aren't appearing.
+                if !permissions.accessibility {
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.orange)
+                            .accessibilityHidden(true)
+                        Text(GuideText.t(.notchNeedsAccessibility))
+                            .font(.system(size: 13))
+                            .fixedSize(horizontal: false, vertical: true)
+                        Spacer(minLength: 8)
+                        Button(GuideText.t(.openSystemSettings)) {
+                            permissions.requestAccessibility()
+                        }
+                        .controlSize(.small)
                     }
+                    .accessibilityElement(children: .combine)
                 }
-                .labelsHidden()
-                .pickerStyle(.menu)
-                .fixedSize()
+                HStack(spacing: 10) {
+                    Picker("Section", selection: $selectedSection) {
+                        ForEach(Section.allCases) { section in
+                            Image(systemName: section.icon)
+                                .help(LocalizedStringKey(section.rawValue))
+                                .accessibilityLabel(Text(LocalizedStringKey(section.rawValue)))
+                                .tag(section)
+                        }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.segmented)
+                    .fixedSize()
+                    Text(LocalizedStringKey(selectedSection.rawValue))
+                        .font(.system(size: 13, weight: .semibold))
+                }
             }
-            // On the grouped-form grid like every other page's introduction,
-            // with no full-bleed rule: the form's own sections start below.
             .padding(.horizontal, GroupedFormMetrics.rowInset)
             .frame(maxWidth: GroupedFormMetrics.maxWidth, alignment: .leading)
             .padding(.horizontal, GroupedFormMetrics.outerMargin)
@@ -90,6 +116,8 @@ struct NotchSettingsView: View {
         .tint(.effectiveAccent)
         .environmentObject(NotchIntegration.shared.viewModel)
         .navigationTitle("Notch")
+        // Follow the language chosen in Sanity, not only the system's.
+        .environment(\.locale, Locale(identifier: L10n.shared.language.rawValue))
         .id(accentColorUpdateTrigger)
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("AccentColorChanged"))) { _ in
             accentColorUpdateTrigger = UUID()

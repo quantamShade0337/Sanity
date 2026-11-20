@@ -63,7 +63,7 @@ struct FocusedMenuBarPanel: View {
     private var masterAudioSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
-                sectionLabel("Audio")
+                sectionLabel(t(.panelSound))
                 Spacer(minLength: 8)
                 outputPicker
             }
@@ -80,12 +80,12 @@ struct FocusedMenuBarPanel: View {
                     }
                     .buttonStyle(.plain)
                     .disabled(mixer.systemOutputMuted == nil)
-                    .help(mixer.systemOutputMuted == true ? "Unmute" : "Mute")
-                    .accessibilityLabel(mixer.systemOutputMuted == true ? "Unmute system audio" : "Mute system audio")
+                    .help(t(mixer.systemOutputMuted == true ? .unmute : .mute))
+                    .accessibilityLabel(t(mixer.systemOutputMuted == true ? .unmute : .mute))
 
                     Slider(value: masterVolumeBinding, in: 0...1)
                         .controlSize(.small)
-                        .accessibilityLabel("System volume")
+                        .accessibilityLabel(t(.systemVolume))
 
                     Text(volume, format: .percent.precision(.fractionLength(0)))
                         .font(.system(size: 11, weight: .medium, design: .rounded))
@@ -94,7 +94,7 @@ struct FocusedMenuBarPanel: View {
                         .frame(width: 34, alignment: .trailing)
                 }
             } else {
-                Text("This output does not provide software volume control.")
+                Text(t(.noSoftwareVolume))
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
             }
@@ -102,7 +102,7 @@ struct FocusedMenuBarPanel: View {
     }
 
     private var outputPicker: some View {
-        Picker("Output device", selection: outputSelection) {
+        Picker(l10n.s.mixerSystemOutputTitle, selection: outputSelection) {
             if mixer.currentOutputDeviceUID == nil {
                 Text(l10n.s.mixerOutputUnavailable)
                     .tag(MixerRoutingSupport.systemDefaultSelectionID)
@@ -116,19 +116,19 @@ struct FocusedMenuBarPanel: View {
         .controlSize(.small)
         .frame(maxWidth: 202, alignment: .trailing)
         .disabled(mixer.outputDevices.filter(\.canBeDefaultOutput).isEmpty)
-        .accessibilityLabel("Current output device")
+        .accessibilityLabel(l10n.s.mixerSystemOutputTooltip)
     }
 
     private var applicationAudioSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            sectionLabel("App volume")
+            sectionLabel(l10n.s.mixerSection)
 
             if !AppVolumeMixer.isSupported {
                 compactMessage(l10n.s.mixerUnavailable, symbol: "speaker.slash")
             } else if mixer.needsPermission {
                 permissionMessage
             } else if activeApps.isEmpty {
-                compactMessage("Apps appear here while they are producing audio.",
+                compactMessage(l10n.s.mixerEmpty,
                                symbol: "waveform")
             } else {
                 ScrollView {
@@ -173,6 +173,8 @@ struct FocusedMenuBarPanel: View {
             .padding(.vertical, 3)
     }
 
+    private func t(_ key: GuideKey) -> String { GuideText.t(key, l10n.language) }
+
     private func openSanity(_ page: SettingsPage) {
         appDelegate()?.closePopover {
             SettingsRouter.shared.page = page
@@ -188,7 +190,7 @@ struct FocusedMenuBarPanel: View {
             } label: {
                 HStack(spacing: 6) {
                     BrandMarkInBrandColour()
-                    Text("Open Sanity")
+                    Text(t(.openSanity))
                         .font(.system(size: 12, weight: .medium))
                 }
                 .frame(maxWidth: .infinity)
@@ -266,7 +268,7 @@ private struct ActiveAppVolumeRow: View {
                 }
 
                 if app.isBypassed {
-                    Text("This app manages its own audio.")
+                    Text(L10n.shared.s.mixerBypassedCaption)
                         .font(.system(size: 10.5))
                         .foregroundStyle(.secondary)
                 } else {
@@ -291,8 +293,8 @@ private struct ActiveAppVolumeRow: View {
                                 .frame(width: 16, height: 16)
                         }
                         .buttonStyle(.plain)
-                        .help(app.volume <= 0.001 ? "Unmute \(app.name)" : "Mute \(app.name)")
-                        .accessibilityLabel(app.volume <= 0.001 ? "Unmute \(app.name)" : "Mute \(app.name)")
+                        .help("\(GuideText.t(app.volume <= 0.001 ? .unmute : .mute)) \(app.name)")
+                        .accessibilityLabel("\(GuideText.t(app.volume <= 0.001 ? .unmute : .mute)) \(app.name)")
                     }
                 }
             }

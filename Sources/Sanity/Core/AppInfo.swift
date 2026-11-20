@@ -7,11 +7,13 @@ import Foundation
 enum AppInfo {
     static let name = "Sanity"
     static let copyright = "© 2026 Sanity"
-    static let websiteURL = URL(string: "https://vorssaint.com")!
-    static let repositoryURL = URL(string: "https://github.com/vorssaintapp/vorssaint-utils")!
-    static let coffeeURL = URL(string: "https://buymeacoffee.com/vorssaint")!
-    static let discordURL = URL(string: "https://discord.gg/M6BwWH4BJp")!
-    static let socialURL = URL(string: "https://x.com/vorssaint")!
+    static let repositoryURL = URL(string: "https://github.com/quantamShade0337/Sanity")!
+    static let websiteURL = repositoryURL
+    /// Optional ways to support the project. Each one's button and intro
+    /// step only appear once its link is set here.
+    static let coffeeURL: URL? = nil
+    static let discordURL: URL? = nil
+    static let socialURL: URL? = nil
 
     /// The bundle version. The fallback only applies to the bare binary
     /// (e.g. `--selftest`), never the shipped app, which reads its Info.plist.

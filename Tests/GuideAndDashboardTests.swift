@@ -176,3 +176,21 @@ final class MetricFormatTests: XCTestCase {
         XCTAssertEqual(MetricFormat.uptime(90_000), "1d 1h")
     }
 }
+
+final class FittedHistoryTests: XCTestCase {
+    func testFlatSeriesSitsMidHeightNotAtTheTop() {
+        let fitted = DashboardView.fittedHistory([0.76, 0.76, 0.77, 0.76])
+        XCTAssertTrue(fitted.allSatisfy { $0 > 0.3 && $0 < 0.7 }, "\(fitted)")
+    }
+
+    func testRealChangeUsesTheHeight() {
+        let fitted = DashboardView.fittedHistory([0.40, 0.70])
+        XCTAssertLessThan(fitted[0], 0.25)
+        XCTAssertGreaterThan(fitted[1], 0.75)
+    }
+
+    func testStaysInRange() {
+        let fitted = DashboardView.fittedHistory([0.0, 1.0, 0.5])
+        XCTAssertTrue(fitted.allSatisfy { (0...1).contains($0) })
+    }
+}

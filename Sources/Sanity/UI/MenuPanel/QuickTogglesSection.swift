@@ -4,32 +4,6 @@
 import AppKit
 import SwiftUI
 
-/// The quick toggles tab of the menu panel: one-click system actions, each an
-/// action row that can be hidden and reordered in the section's edit mode.
-struct QuickTogglesSection: View {
-    @ObservedObject private var l10n = L10n.shared
-    @State private var draggingItem: QuickToggleAction?
-    var collapsible = true
-
-    var body: some View {
-        PanelSection(.toggles,
-                     title: FeatureStrings.quickToggles(l10n.language).pageTitle,
-                     collapsible: collapsible,
-                     supportsEditing: true,
-                     resetAction: QuickTogglesList.resetPanelDefaults) { editing in
-            QuickTogglesList(editing: editing, draggingItem: $draggingItem) {
-                appDelegate()?.closePopover()
-            }
-            // Actions here activate other apps (the Finder restarting, System
-            // Events, the Trash confirmation), which would dismiss the panel
-            // mid-flow; holding it open keeps a toggle-back one click away.
-            // The status icon and switching tabs still close as always.
-            .onAppear { PanelInteractionState.shared.viewKeepsPopoverOpen = true }
-            .onDisappear { PanelInteractionState.shared.viewKeepsPopoverOpen = false }
-        }
-    }
-}
-
 /// The toggles hosted inside the quick panel (⌃⌘V), replacing the grid like
 /// the other utilities do.
 struct PanelQuickTogglesView: View {

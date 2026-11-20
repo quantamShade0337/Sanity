@@ -43,6 +43,8 @@ enum GuideKey: String, CaseIterable {
     case openCleaner, quitAppShort, freeOfTotal, appColumn, evOff, evSaved
     case backgroundProcesses, percentFull
     case batteryCharging, batteryCharged, batteryNotCharging, batteryLowPower
+    case panelSound, openSanity, mute, unmute, systemVolume, noSoftwareVolume, everythingElse
+    case notchNeedsAccessibility
     // Page summaries
     case sumGeneral, sumFeatures, sumEnergy, sumMonitor, sumMouse, sumSwitcher, sumWindowLayout
     case sumAutoQuit, sumQuitProtection, sumClipboard, sumCutPaste, sumShelf, sumMedia
@@ -207,6 +209,14 @@ extension GuideStrings {
         .batteryCharged: "Charged",
         .batteryNotCharging: "Not Charging",
         .batteryLowPower: "Low Power",
+        .panelSound: "Sound",
+        .notchNeedsAccessibility: "Volume and brightness alerts need Accessibility permission. Until it's allowed, macOS shows its own.",
+        .everythingElse: "Everything else",
+        .openSanity: "Open Sanity",
+        .mute: "Mute",
+        .unmute: "Unmute",
+        .systemVolume: "System volume",
+        .noSoftwareVolume: "This output doesn't offer volume control.",
         .sumGeneral: "Basic options: start Sanity when you log in, change the language and appearance, and choose what the menu bar icon shows.",
         .sumFeatures: "Turn whole features on or off. Anything you switch off here disappears from Sanity completely, so start small and add more later.",
         .sumEnergy: "Keep your Mac awake, change screen brightness, and control what happens to Bluetooth when your Mac sleeps.",

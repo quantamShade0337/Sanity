@@ -140,12 +140,24 @@ try png(width: 1000, height: 640) { drawMark(Mark(), into: $0, rect: CGRect(x: 0
 try png(width: 640, height: 410) { drawMark(Mark(), into: $0, rect: CGRect(x: 0, y: 0, width: 640, height: 410), color: black) }
     .write(to: out.appendingPathComponent("BrandMark.png"))
 
+// Small in-app mark (sidebar, Dashboard identity line): heavier strokes,
+// a bigger moon and wider gaps so the details survive at 16-20 pt.
+try png(width: 120, height: 77) {
+    drawMark(Mark(weight: 1.9), into: $0, rect: CGRect(x: 0, y: 0, width: 120, height: 77), color: black)
+}.write(to: out.appendingPathComponent("BrandMarkSmall.png"))
+
 // Menu bar (template, heavier strokes for the tiny size).
 for (name, w, h) in [("MenuBarIcon.png", 26, 20), ("MenuBarIcon@2x.png", 52, 40)] {
     try png(width: w, height: h) {
         drawMark(Mark(weight: 1.7), into: $0, rect: CGRect(x: 0, y: 0, width: w, height: h), color: black)
     }.write(to: out.appendingPathComponent(name))
 }
+
+// Icon Composer layer: the white mark on a transparent 1024 canvas. The
+// .icon bundle supplies the Sanity Indigo fill, depth and lighting.
+try png(width: 1024, height: 1024) {
+    drawMark(Mark(), into: $0, rect: CGRect(x: 192, y: 262, width: 640, height: 500), color: white)
+}.write(to: out.appendingPathComponent("IconLayer.png"))
 
 // App icon: flat Sanity Indigo on the macOS icon grid, white mark.
 let iconset = out.appendingPathComponent("AppIcon.iconset")

@@ -115,13 +115,13 @@ enum SelfTest {
         }
 
         for warning in warnings {
-            print("SELFTEST WARNING: \(warning)")
+            Swift.print("SELFTEST WARNING: \(warning)")
         }
         if failures.isEmpty {
-            print("SELFTEST OK")
+            Swift.print("SELFTEST OK")
             exit(0)
         } else {
-            print("SELFTEST FAILED: \(failures.joined(separator: ", "))")
+            Swift.print("SELFTEST FAILED: \(failures.joined(separator: ", "))")
             exit(1)
         }
     }
@@ -160,7 +160,7 @@ enum SelfTest {
 enum SensorDump {
     static func runAndExit() -> Never {
         guard let smc = SMCClient() else {
-            print("AppleSMC unavailable")
+            Swift.print("AppleSMC unavailable")
             exit(1)
         }
         let keys = smc.keys { name in
@@ -169,7 +169,7 @@ enum SensorDump {
         }
         let cpuPlatform = TemperatureSensorSelector.currentPlatform()
         let hasCPUCoreSet = TemperatureSensorSelector.hasCPUCoreSet(platform: cpuPlatform)
-        print("component    key   type   °C")
+        Swift.print("component    key   type   °C")
         for key in keys.sorted(by: { $0.name < $1.name }) {
             guard let value = smc.readValue(key), value > 1, value < 125 else { continue }
             let component: String
@@ -182,7 +182,7 @@ enum SensorDump {
             } else {
                 component = "cpu"
             }
-            print(String(format: "%-11@  %@  %@  %6.2f",
+            Swift.print(String(format: "%-11@  %@  %@  %6.2f",
                          component as NSString, key.name, key.dataType, value))
         }
         exit(0)

@@ -50,6 +50,11 @@ final class DashboardSnapshotTests: XCTestCase {
             else { UserDefaults.standard.removeObject(forKey: detailsKey) }
         }
         UserDefaults.standard.set(true, forKey: detailsKey)
+        let languageWas = L10n.shared.language
+        L10n.shared.language = .de
+        router.page = .notch
+        try render(SettingsView(), name: "window-notch-de", appearance: .aqua, size: window, settle: 2)
+        L10n.shared.language = languageWas
         try render(DashboardView(), name: "dashboard-full", appearance: .aqua,
                    size: NSSize(width: 840, height: 1400), settle: 3)
     }

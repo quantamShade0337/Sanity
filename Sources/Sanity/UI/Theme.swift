@@ -159,8 +159,15 @@ struct BrandMark: View {
         return NSImage(contentsOf: url)
     }()
 
+    /// A heavier cut of the mark for small sizes, where the orbit gaps and
+    /// moon would otherwise disappear.
+    private static let smallMark: NSImage? = {
+        guard let url = Bundle.main.url(forResource: "BrandMarkSmall", withExtension: "png") else { return nil }
+        return NSImage(contentsOf: url)
+    }()
+
     var body: some View {
-        if let mark = Self.mark {
+        if let mark = (width <= 26 ? Self.smallMark : nil) ?? Self.mark {
             Image(nsImage: mark)
                 .renderingMode(.template)
                 .interpolation(.high)

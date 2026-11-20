@@ -169,7 +169,7 @@ struct UpdateSupportIntroView: View {
     @State private var step: SupportUpdateIntroStep
     @State private var isMovingForward = true
 
-    init(initialStep: SupportUpdateIntroStep = .discord,
+    init(initialStep: SupportUpdateIntroStep = .first,
          onFinish: @escaping () -> Void) {
         self.onFinish = onFinish
         _step = State(initialValue: initialStep)
@@ -260,7 +260,7 @@ struct UpdateSupportIntroView: View {
             .padding(.vertical, 2)
 
             Button {
-                openURL(AppInfo.discordURL)
+                if let url = AppInfo.discordURL { openURL(url) }
             } label: {
                 HStack(spacing: 8) {
                     DiscordMark(width: 19)
@@ -271,7 +271,7 @@ struct UpdateSupportIntroView: View {
             .controlSize(.large)
             .tint(Color(red: 0.35, green: 0.40, blue: 0.94))
 
-            Text(AppInfo.discordURL.absoluteString
+            Text((AppInfo.discordURL?.absoluteString ?? "")
                 .replacingOccurrences(of: "https://", with: ""))
                 .font(.caption)
                 .foregroundStyle(.tertiary)
@@ -319,7 +319,7 @@ struct UpdateSupportIntroView: View {
                 .frame(maxWidth: 440)
 
             Button {
-                openURL(AppInfo.socialURL)
+                if let url = AppInfo.socialURL { openURL(url) }
             } label: {
                 HStack(spacing: 8) {
                     XLogoShape()
@@ -331,7 +331,7 @@ struct UpdateSupportIntroView: View {
             .buttonStyle(XFollowButtonStyle())
             .padding(.top, 4)
 
-            Text(AppInfo.socialURL.absoluteString
+            Text((AppInfo.socialURL?.absoluteString ?? "")
                 .replacingOccurrences(of: "https://", with: ""))
                 .font(.caption)
                 .foregroundStyle(.tertiary)
@@ -411,14 +411,16 @@ private struct UpdateSupportContent: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: 440)
 
-            Button {
-                openURL(AppInfo.coffeeURL)
-            } label: {
-                Label(l10n.s.supportIntroCoffeeButton,
-                      systemImage: "cup.and.saucer.fill")
+            if let coffee = AppInfo.coffeeURL {
+                Button {
+                    openURL(coffee)
+                } label: {
+                    Label(l10n.s.supportIntroCoffeeButton,
+                          systemImage: "cup.and.saucer.fill")
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
 
             Text(l10n.s.supportIntroStarMessage)
                 .font(.system(size: 13.5, weight: .medium))
@@ -432,7 +434,7 @@ private struct UpdateSupportContent: View {
             } label: {
                 Label(l10n.s.supportIntroStarButton, systemImage: "star.fill")
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(AppInfo.coffeeURL == nil ? AnyPrimitiveButtonStyle.prominent : .bordered)
             .controlSize(.large)
 
             Text(l10n.s.donateThanks)
@@ -762,5 +764,18 @@ private struct ControlledVideoView: NSViewRepresentable {
 
     final class Coordinator {
         var url: URL?
+    }
+}
+
+
+/// Lets a button switch between prominent and bordered at runtime.
+enum AnyPrimitiveButtonStyle: PrimitiveButtonStyle {
+    case prominent, bordered
+    @ViewBuilder
+    func makeBody(configuration: Configuration) -> some View {
+        switch self {
+        case .prominent: Button(configuration).buttonStyle(.borderedProminent)
+        case .bordered: Button(configuration).buttonStyle(.bordered)
+        }
     }
 }

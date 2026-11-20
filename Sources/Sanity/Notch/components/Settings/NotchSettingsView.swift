@@ -470,18 +470,6 @@ struct HUD: View {
                     }
                 }
                 
-                Picker("Progress bar style", selection: $enableGradient) {
-                    Text("Hierarchical")
-                        .tag(false)
-                    Text("Gradient")
-                        .tag(true)
-                }
-                Defaults.Toggle(key: .systemEventIndicatorShadow) {
-                    Text("Enable glowing effect")
-                }
-                Defaults.Toggle(key: .systemEventIndicatorUseAccent) {
-                    Text("Tint progress bar with accent color")
-                }
             } header: {
                 Text("General")
             }
@@ -503,24 +491,11 @@ struct HUD: View {
             }
             .disabled(!hudReplacement)
             
+            // The closed notch always uses the iPhone Dynamic Island compact
+            // layout, so there is no style to choose: only bar or number.
             Section {
-                Picker("HUD style", selection: $inlineHUD) {
-                    Text("Default")
-                        .tag(false)
-                    Text("Inline")
-                        .tag(true)
-                }
-                .onChange(of: Defaults[.inlineHUD]) {
-                    if Defaults[.inlineHUD] {
-                        withAnimation {
-                            Defaults[.systemEventIndicatorShadow] = false
-                            Defaults[.enableGradient] = false
-                        }
-                    }
-                }
-                
                 Defaults.Toggle(key: .showClosedNotchHUDPercentage) {
-                    Text("Show percentage")
+                    Text("Show percentage instead of a bar")
                 }
             } header: {
                 Text("Closed Notch")

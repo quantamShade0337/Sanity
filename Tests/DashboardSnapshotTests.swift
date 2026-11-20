@@ -62,25 +62,28 @@ final class DashboardSnapshotTests: XCTestCase {
     }
 
     func testRenderIsland() throws {
-        let events: [(String, String, Bool)] = [
-            ("cup.and.heat.waves.fill", GuideText.t(.on, .enUS), true),
-            ("cup.and.saucer.fill", GuideText.t(.evOff, .enUS), false),
-            ("doc.on.clipboard.fill", GuideText.t(.evCopied, .enUS), true),
-            ("camera.viewfinder", GuideText.t(.evSaved, .enUS), true),
-            ("airpods", "AirPods Pro", true),
+        let events: [(String, IslandCompact.Trailing, Bool)] = [
+            ("speaker.wave.2.fill", .level(0.55, showsPercentage: false), true),
+            ("speaker.slash.fill", .level(0, showsPercentage: false), false),
+            ("sun.max.fill", .level(0.8, showsPercentage: true), true),
+            ("mic.slash.fill", .text(GuideText.t(.evOff, .enUS)), false),
+            ("cup.and.heat.waves.fill", .text(GuideText.t(.on, .enUS)), true),
+            ("doc.on.clipboard.fill", .text(GuideText.t(.evCopied, .enUS)), true),
+            ("camera.viewfinder", .text(GuideText.t(.evSaved, .enUS)), true),
+            ("airpods", .text("AirPods Pro"), true),
         ]
-        let island = VStack(spacing: 18) {
+        let island = VStack(spacing: 14) {
             ForEach(Array(events.enumerated()), id: \.offset) { _, event in
-                SanityEventCompact(icon: event.0, label: event.1, isActive: event.2,
-                                   notchWidth: 185, height: 32)
+                IslandCompact(icon: event.0, trailing: event.1, isActive: event.2,
+                              notchWidth: 185, height: 32)
                     .background(Color.black, in: UnevenRoundedRectangle(
                         bottomLeadingRadius: 12, bottomTrailingRadius: 12))
             }
         }
         .padding(30)
-        .frame(width: 520, height: 330)
+        .frame(width: 520, height: 470)
         .background(Color(white: 0.85))
-        try render(island, name: "island", appearance: .aqua, size: NSSize(width: 520, height: 330), settle: 0.5)
+        try render(island, name: "island", appearance: .aqua, size: NSSize(width: 520, height: 470), settle: 0.5)
     }
 
     func testRenderOnboarding() throws {

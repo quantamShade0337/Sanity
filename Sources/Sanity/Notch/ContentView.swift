@@ -242,6 +242,21 @@ struct NotchContentView: View {
         }
     }
 
+    /// Alert types shown in the compact island.
+    static let compactTypes: Set<SneakContentType> = [.volume, .brightness, .backlight, .mic, .event]
+
+    private var compactTrailing: IslandCompact.Trailing {
+        let peek = coordinator.sneakPeek
+        switch peek.type {
+        case .mic:
+            return .text(GuideText.t(peek.value > 0 ? .on : .evOff))
+        case .event:
+            return .text(peek.label)
+        default:
+            return .level(Double(peek.value), showsPercentage: Defaults[.showClosedNotchHUDPercentage])
+        }
+    }
+
     @ViewBuilder
     func NotchLayout() -> some View {
         VStack(alignment: .leading) {
@@ -260,41 +275,46 @@ struct NotchContentView: View {
                     if coordinator.expandingView.type == .battery && coordinator.expandingView.show
                         && vm.notchState == .closed && Defaults[.showPowerStatusNotifications]
                     {
+                        // Same geometry as every other compact alert: equal
+                        // sides and the same camera gap, so the camera stays
+                        // centred and the island never changes width between
+                        // alerts.
                         HStack(spacing: 0) {
-                            HStack {
-                                Text(batteryModel.statusText)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.white)
-                            }
+                            Text(batteryModel.statusText)
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                                .frame(width: IslandCompact.sideWidth, alignment: .leading)
+                                .padding(.leading, IslandCompact.edgeInset)
 
                             Rectangle()
                                 .fill(.black)
-                                .frame(width: vm.closedNotchSize.width + 10)
+                                .frame(width: vm.closedNotchSize.width - 20)
 
-                            HStack {
-                                BoringBatteryView(
-                                    batteryWidth: 30,
-                                    isCharging: batteryModel.isCharging,
-                                    isInLowPowerMode: batteryModel.isInLowPowerMode,
-                                    isPluggedIn: batteryModel.isPluggedIn,
-                                    levelBattery: batteryModel.levelBattery,
-                                    isForNotification: true
-                                )
-                            }
-                            .frame(width: 76, alignment: .trailing)
+                            BoringBatteryView(
+                                batteryWidth: 30,
+                                isCharging: batteryModel.isCharging,
+                                isInLowPowerMode: batteryModel.isInLowPowerMode,
+                                isPluggedIn: batteryModel.isPluggedIn,
+                                levelBattery: batteryModel.levelBattery,
+                                isForNotification: true
+                            )
+                            .frame(width: IslandCompact.sideWidth, alignment: .trailing)
+                            .padding(.trailing, IslandCompact.edgeInset)
                         }
                         .frame(height: vm.effectiveClosedNotchHeight, alignment: .center)
-                      } else if coordinator.sneakPeek.show && coordinator.sneakPeek.type == .event && vm.notchState == .closed {
-                          // Sanity's own alerts always use the iPhone-style
-                          // compact island, whatever the HUD style setting.
-                          SanityEventCompact(icon: coordinator.sneakPeek.icon,
-                                             label: coordinator.sneakPeek.label,
-                                             isActive: coordinator.sneakPeek.value > 0,
-                                             notchWidth: vm.closedNotchSize.width,
-                                             height: vm.effectiveClosedNotchHeight)
-                              .transition(.opacity)
-                      } else if coordinator.sneakPeek.show && Defaults[.inlineHUD] && (coordinator.sneakPeek.type != .music) && (coordinator.sneakPeek.type != .battery) && vm.notchState == .closed {
-                          InlineHUD(type: $coordinator.sneakPeek.type, value: $coordinator.sneakPeek.value, icon: $coordinator.sneakPeek.icon, hoverAnimation: $isHovering, gestureProgress: $gestureProgress)
+                      } else if coordinator.sneakPeek.show && Self.compactTypes.contains(coordinator.sneakPeek.type) && vm.notchState == .closed {
+                          // Every short-lived alert uses the iPhone Dynamic
+                          // Island compact layout: same height, glyph left of
+                          // the camera, one word or a level bar right of it.
+                          IslandCompact(icon: IslandCompact.glyph(for: coordinator.sneakPeek.type,
+                                                                  value: coordinator.sneakPeek.value,
+                                                                  override: coordinator.sneakPeek.icon),
+                                        trailing: compactTrailing,
+                                        isActive: coordinator.sneakPeek.value > 0,
+                                        notchWidth: vm.closedNotchSize.width,
+                                        height: vm.effectiveClosedNotchHeight)
                               .transition(.opacity)
                       } else if (!coordinator.expandingView.show || coordinator.expandingView.type == .music) && vm.notchState == .closed && (musicManager.isPlaying || !musicManager.isPlayerIdle) && coordinator.musicLiveActivityEnabled && !vm.hideOnClosed {
                           MusicLiveActivity()
@@ -310,28 +330,8 @@ struct NotchContentView: View {
                        }
 
                       if coordinator.sneakPeek.show {
-                          if (coordinator.sneakPeek.type != .music) && (coordinator.sneakPeek.type != .battery) && (coordinator.sneakPeek.type != .event) && !Defaults[.inlineHUD] && vm.notchState == .closed {
-                              SystemEventIndicatorModifier(
-                                  eventType: $coordinator.sneakPeek.type,
-                                  value: $coordinator.sneakPeek.value,
-                                  icon: $coordinator.sneakPeek.icon,
-                                  sendEventBack: { newVal in
-                                      switch coordinator.sneakPeek.type {
-                                      case .volume:
-                                          VolumeManager.shared.setAbsolute(Float32(newVal))
-                                      case .brightness:
-                                          BrightnessManager.shared.setAbsolute(value: Float32(newVal))
-                                      default:
-                                          break
-                                      }
-                                  }
-                              )
-                              .padding(.bottom, 10)
-                              .padding(.leading, 4)
-                              .padding(.trailing, 8)
-                          }
                           // Old sneak peek music
-                          else if coordinator.sneakPeek.type == .music {
+                          if coordinator.sneakPeek.type == .music {
                               if vm.notchState == .closed && !vm.hideOnClosed && Defaults[.sneakPeekStyles] == .standard {
                                   HStack(alignment: .center) {
                                       Image(systemName: "music.note")

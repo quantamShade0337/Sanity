@@ -1,4 +1,5 @@
 import Combine
+import Defaults
 import CoreAudio
 import Foundation
 
@@ -60,6 +61,12 @@ final class NotchIntegration {
         BoringViewCoordinator.shared.firstLaunch = false
         BoringViewCoordinator.shared.helloAnimationRunning = false
         viewModel.close()
+        // The decorative HUD options (glow, gradient bar, accent tint) were
+        // removed with the move to the iPhone Dynamic Island look; make sure
+        // values saved by older versions can't bring them back.
+        Defaults[.systemEventIndicatorShadow] = false
+        Defaults[.enableGradient] = false
+        Defaults[.systemEventIndicatorUseAccent] = false
         controller.applicationDidFinishLaunching(notification)
         observeSanityEvents()
     }

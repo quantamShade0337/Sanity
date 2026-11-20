@@ -87,8 +87,22 @@ Don't copy the Dashboard's layout onto a screen that has a different job.
 | Glance | Menu bar panel | Compact: eyebrow labels, a mini readings strip that opens the Dashboard, one bordered "Open Sanity" with the mark |
 | Welcome | Onboarding | Apple welcome-sheet pattern: app icon, plain title, accent symbols, no banners |
 
-## Notch alerts
+## Notch alerts (Dynamic Island)
 
-Sanity's notch alerts copy the iPhone Dynamic Island compact layout: same
-height as the notch, a glyph left of the camera, one short word right of it,
-equal sides, dimmed for "off" states (`SanityEventCompact`).
+Every short-lived notch alert follows the iPhone Dynamic Island compact
+presentation, through one view (`IslandCompact`):
+
+- The island keeps the notch's height and widens sideways. Nothing drops
+  below the camera.
+- A glyph sits left of the camera, and one piece of information sits right
+  of it: a single word ("On", "Off", "Copied", "Saved", a device name) or,
+  for levels, a short white bar on a faint track. A percentage replaces the
+  bar only if the person turns that on.
+- Both sides are the same width (`IslandCompact.sideWidth`) with the same
+  camera gap, so the camera stays centred and the island width doesn't jump
+  between alerts. The battery alert uses the same geometry.
+- White on black only. "Off" states dim to 55%. No glow, no gradients, no
+  accent tints, no words like "Volume" beside the glyph.
+- Volume, brightness, keyboard backlight, mic and Sanity's own events all use
+  this layout. Music keeps its compact live activity (artwork left, waveform
+  right), which already follows the same pattern.

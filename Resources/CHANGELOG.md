@@ -4,7 +4,7 @@ All notable changes to Sanity are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
-## [0.1.0] - 2026-11-20
+## [1.0.0] - 2026-11-21
 
 ### Summary
 The first public release of Sanity: a menu bar utility for your Mac that shows how it's doing at a glance, adds a Dynamic Island to the notch, and gathers dozens of everyday tools in one place.

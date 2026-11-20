@@ -81,7 +81,7 @@ targets:
         SWIFT_INCLUDE_PATHS: "$(PROJECT_DIR)/Support/HIDEventSystem $(PROJECT_DIR)/Support/VMStatisticsCompat"
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         CURRENT_PROJECT_VERSION: 82
-        MARKETING_VERSION: 0.1.0
+        MARKETING_VERSION: 1.0.0
     postBuildScripts:
       - name: Build bundled helpers
         basedOnDependencyAnalysis: false

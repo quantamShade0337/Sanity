@@ -48,16 +48,6 @@ struct UpdateHighlightsView: View {
                 actionLabel: s.highlightsConfigure,
                 action: { openSettings(AppFeature.screenshot.settingsDestination) }))
         }
-        if AppFeature.clipboardHistory.isAvailable {
-            pages.append(Highlight(
-                id: "clipboard-palette",
-                imageName: "highlights-clipboard",
-                symbol: "doc.on.clipboard",
-                title: s.highlightsTitleClipboardRedesign,
-                caption: s.highlightsCaptionClipboardRedesign,
-                actionLabel: s.highlightsConfigure,
-                action: { openSettings(AppFeature.clipboardHistory.settingsDestination) }))
-        }
         return pages
     }
 

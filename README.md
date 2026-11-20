@@ -64,9 +64,16 @@ it:
 ## Privacy
 
 Sanity has no account, analytics or server of its own. It only goes online
-for features you use: lyrics (lrclib.net), Homebrew data (formulae.brew.sh),
-and the network speed test (speed.cloudflare.com). Automatic updates are
-off. New versions come from the Releases page.
+for features you use:
+
+- **Lyrics:** lrclib.net
+- **Homebrew:** formulae.brew.sh, for popular packages
+- **App Updates:** formulae.brew.sh and the App Store's lookup
+  (itunes.apple.com), to check your apps for newer versions
+- **Network speed test:** speed.cloudflare.com
+- **The animated notch music icon,** if you choose it: lottiefiles.com
+
+Automatic updates are off. New versions come from the Releases page.
 
 Feedback opens a public GitHub issue, so you see everything before it is
 sent.

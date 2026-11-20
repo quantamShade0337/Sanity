@@ -6,14 +6,16 @@ import Foundation
 /// Static identity of the app, shared by UI, notifications and tooling.
 enum AppInfo {
     static let name = "Sanity"
-    static let copyright = "© 2026 Sanity"
+    static let copyright = "© 2026 Ethan Soh · GPL-3.0-or-later"
     static let repositoryURL = URL(string: "https://github.com/quantamShade0337/Sanity")!
     static let websiteURL = repositoryURL
-    /// Optional ways to support the project. Each one's button and intro
-    /// step only appear once its link is set here.
-    static let coffeeURL: URL? = nil
-    static let discordURL: URL? = nil
-    static let socialURL: URL? = nil
+    /// Where people report problems and request features.
+    static let issuesURL = repositoryURL.appendingPathComponent("issues/new")
+    /// The server that hosts expiring share links for screenshots and
+    /// recordings. Sanity has none yet, so link sharing stays hidden; the
+    /// code inherited from Vorssaint uploaded to Vorssaint's own server.
+    static let shareLinkServiceURL: URL? = nil
+    static var linkSharingAvailable: Bool { shareLinkServiceURL != nil }
 
     /// The bundle version. The fallback only applies to the bare binary
     /// (e.g. `--selftest`), never the shipped app, which reads its Info.plist.

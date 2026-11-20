@@ -58,7 +58,8 @@ final class NSScreenUUIDCache {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.rebuildCache()
+            // Delivered on the main queue, so the main-actor cache is safe here.
+            MainActor.assumeIsolated { self?.rebuildCache() }
         }
     }
     

@@ -39,11 +39,11 @@ struct ScreenshotShareResponse: Decodable {
 }
 
 enum ScreenshotSharingSupport {
-    static let productionEndpoint = URL(string: "https://screenshots.vorssaint.com")!
+    static var productionEndpoint: URL? { AppInfo.shareLinkServiceURL }
     static let developerBundleIdentifier = "com.ethansoh.Sanity.dev"
     static let maximumUploadBytes = 25 * 1_024 * 1_024
 
-    static func endpoint(bundleIdentifier: String?, developerOverride: String?) -> URL {
+    static func endpoint(bundleIdentifier: String?, developerOverride: String?) -> URL? {
         guard bundleIdentifier == developerBundleIdentifier,
               let developerOverride,
               let candidate = sanitizedEndpoint(developerOverride)

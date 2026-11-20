@@ -418,7 +418,7 @@ struct SettingsView: View {
         case .advanced: AdvancedSettings()
         case .about: AboutSettings()
         case .releaseNotes: ReleaseNotesSettings()
-        case .support: SupportSettings()
+        case .credits: CreditsSettings()
         }
     }
 }
@@ -1664,7 +1664,7 @@ struct AboutSettings: View {
                 Button(l10n.s.reviewIntro) { appDelegate()?.showOnboarding() }
                 Text("·").foregroundStyle(.tertiary)
                 Button(l10n.s.reviewHighlights) {
-                    appDelegate()?.showUpdateHighlights(includeSupportIntro: true)
+                    appDelegate()?.showUpdateHighlights()
                 }
                 Text("·").foregroundStyle(.tertiary)
                 Link(l10n.s.viewOnGitHub, destination: AppInfo.repositoryURL)
@@ -1812,154 +1812,6 @@ struct ReleaseNotesSettings: View {
                                         withExtension: ext,
                                         subdirectory: subdirectory) else { return nil }
         return NSImage(contentsOf: url)
-    }
-}
-
-// MARK: - Support and community
-
-struct SupportSettings: View {
-    @ObservedObject private var l10n = L10n.shared
-    @Environment(\.openURL) private var openURL
-
-    /// An appeal, so centred: one message and one primary action, then two
-    /// smaller ways to help as hairline-separated rows rather than cards.
-    var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                Image(systemName: "heart.fill")
-                    .font(.system(size: 34))
-                    .foregroundStyle(.pink)
-                    .accessibilityHidden(true)
-
-                Text(l10n.s.donateHeading)
-                    .font(SanityDesign.Typography.display)
-                    .multilineTextAlignment(.center)
-                    .padding(.top, 14)
-                // Without a donation link the page asks for the free kinds of
-                // support only, so the copy never mentions a service that
-                // isn't offered.
-                Text(AppInfo.coffeeURL == nil ? l10n.s.supportIntroStarMessage : l10n.s.donateMessage)
-                    .font(SanityDesign.Typography.body)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: 440)
-                    .padding(.top, 6)
-
-                Group {
-                    if let coffee = AppInfo.coffeeURL {
-                        Button {
-                            openURL(coffee)
-                        } label: {
-                            Label(l10n.s.donateButton, systemImage: "cup.and.saucer.fill")
-                        }
-                    } else {
-                        Button {
-                            openURL(AppInfo.repositoryURL)
-                        } label: {
-                            Label(l10n.s.supportIntroStarButton, systemImage: "star.fill")
-                        }
-                    }
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .padding(.top, 20)
-
-                if AppInfo.coffeeURL != nil || AppInfo.discordURL != nil || AppInfo.socialURL != nil {
-                VStack(spacing: 0) {
-                    SanityHairline()
-                    if AppInfo.coffeeURL != nil {
-                    supportRow(icon: AnyView(Image(systemName: "star.fill")
-                                    .font(.system(size: 15))
-                                    .foregroundStyle(.secondary)),
-                               text: l10n.s.supportIntroStarMessage) {
-                        Button {
-                            openURL(AppInfo.repositoryURL)
-                        } label: {
-                            Text(l10n.s.supportIntroStarButton)
-                        }
-                        .controlSize(.small)
-                    }
-                    SanityHairline()
-                    }
-                    if AppInfo.discordURL != nil || AppInfo.socialURL != nil {
-                    supportRow(icon: AnyView(Image(systemName: "bubble.left.and.bubble.right.fill")
-                                    .font(.system(size: 14))
-                                    .foregroundStyle(.secondary)),
-                               text: l10n.s.discordIntroMessage) {
-                        communityActions
-                    }
-                    SanityHairline()
-                    }
-                }
-                .frame(maxWidth: 520)
-                .padding(.top, 36)
-                }
-
-                Text(l10n.s.donateThanks)
-                    .font(SanityDesign.Typography.caption)
-                    .foregroundStyle(.tertiary)
-                    .padding(.top, 20)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 28)
-            .padding(.top, 36)
-            .padding(.bottom, 28)
-        }
-    }
-
-    private func supportRow<Actions: View>(icon: AnyView, text: String,
-                                           @ViewBuilder actions: () -> Actions) -> some View {
-        HStack(alignment: .top, spacing: 14) {
-            icon
-                .frame(width: 22, height: 20)
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 10) {
-                Text(text)
-                    .font(SanityDesign.Typography.body)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                actions()
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .padding(.vertical, 16)
-    }
-
-    private var communityActions: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 8) {
-                if AppInfo.discordURL != nil { discordButton }
-                if AppInfo.socialURL != nil { socialButton }
-            }
-            VStack(alignment: .leading, spacing: 8) {
-                if AppInfo.discordURL != nil { discordButton }
-                if AppInfo.socialURL != nil { socialButton }
-            }
-        }
-    }
-
-    private var discordButton: some View {
-        Button {
-            if let url = AppInfo.discordURL { openURL(url) }
-        } label: {
-            Text(l10n.s.discordIntroJoinButton)
-        }
-        .controlSize(.small)
-    }
-
-    private var socialButton: some View {
-        Button {
-            if let url = AppInfo.socialURL { openURL(url) }
-        } label: {
-            HStack(spacing: 7) {
-                XLogoShape()
-                    .fill(Color.primary, style: FillStyle(eoFill: true))
-                    .frame(width: 10, height: 10)
-                Text(l10n.s.communityIntroFollowButton)
-            }
-        }
-        .controlSize(.small)
     }
 }
 

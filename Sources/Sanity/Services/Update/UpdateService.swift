@@ -27,7 +27,7 @@ final class UpdateService: ObservableObject {
     /// preview. Set alongside `.available`; cleared otherwise.
     @Published private(set) var availableNotes: String?
 
-    private let repository = "vorssaintapp/vorssaint-utils"
+    private let repository = "quantamShade0337/Sanity"
     // Sanity is an independent app. Keep upstream self-updates disabled until
     // this project has its own signed release feed.
     private let distributionConfigured = false

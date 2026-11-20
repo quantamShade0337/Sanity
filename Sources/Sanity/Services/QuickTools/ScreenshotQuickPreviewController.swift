@@ -453,7 +453,7 @@ private struct ScreenshotQuickPreviewView: View {
                              disabled: model.disabledActions.contains(.copy)) {
                     perform(.copy)
                 }
-                if sharingEnabled, model.sharedRecord == nil {
+                if sharingEnabled, AppInfo.linkSharingAvailable, model.sharedRecord == nil {
                     shareMenu
                 }
                 Spacer(minLength: 4)

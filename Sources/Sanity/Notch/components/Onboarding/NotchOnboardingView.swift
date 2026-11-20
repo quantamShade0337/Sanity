@@ -157,6 +157,6 @@ struct NotchOnboardingView: View {
     }
     
     func requestAccessibilityPermission() async {
-        await XPCHelperClient.shared.ensureAccessibilityAuthorization(promptIfNeeded: true)
+        _ = await XPCHelperClient.shared.ensureAccessibilityAuthorization(promptIfNeeded: true)
     }
 }

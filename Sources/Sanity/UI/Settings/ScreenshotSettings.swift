@@ -156,36 +156,39 @@ struct ScreenshotCaptureSettings: View {
                 Text(strings.toolShortcutsTitle)
             }
 
-            Section {
-                Toggle(strings.shareEnabledToggle, isOn: $sharingEnabled)
-                if sharingEnabled {
-                    Text(strings.shareCaption)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                Button {
-                    showingSharePrivacy = true
-                } label: {
-                    Label(strings.sharePrivacyButton, systemImage: "hand.raised")
-                }
-                if !sharing.records.isEmpty {
-                    Button {
-                        showingSharedLinks = true
-                    } label: {
-                        HStack {
-                            Label(strings.sharedLinksTitle, systemImage: "link")
-                            Spacer()
-                            Text("\(sharing.records.count)")
-                                .foregroundStyle(.secondary)
-                            Image(systemName: "chevron.right")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(.tertiary)
-                        }
+            // Only offered once Sanity has its own share-link server.
+            if AppInfo.linkSharingAvailable {
+                Section {
+                    Toggle(strings.shareEnabledToggle, isOn: $sharingEnabled)
+                    if sharingEnabled {
+                        Text(strings.shareCaption)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
-                    .buttonStyle(.plain)
+                    Button {
+                        showingSharePrivacy = true
+                    } label: {
+                        Label(strings.sharePrivacyButton, systemImage: "hand.raised")
+                    }
+                    if !sharing.records.isEmpty {
+                        Button {
+                            showingSharedLinks = true
+                        } label: {
+                            HStack {
+                                Label(strings.sharedLinksTitle, systemImage: "link")
+                                Spacer()
+                                Text("\(sharing.records.count)")
+                                    .foregroundStyle(.secondary)
+                                Image(systemName: "chevron.right")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(.tertiary)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    }
+                } header: {
+                    Text(strings.shareSectionTitle)
                 }
-            } header: {
-                Text(strings.shareSectionTitle)
             }
         }
         .onAppear { sharing.refresh() }

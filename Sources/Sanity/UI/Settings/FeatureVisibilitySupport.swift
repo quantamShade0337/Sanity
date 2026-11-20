@@ -9,7 +9,7 @@ import Foundation
 enum SettingsPage: Hashable, CaseIterable {
     case dashboard, general, features, notch, energy, monitor
     case mouse, switcher, keyDebounce, superKey, cutPaste, autoQuit, quitProtection, cleaner, uninstaller, urlCleaner, homebrew, appUpdates, media, clipboard, windowLayout, shelf, quickTools, textSnippets, screenshot, radialMenu, commandBar, killProcess
-    case shortcuts, advanced, about, releaseNotes, support
+    case shortcuts, advanced, about, releaseNotes, credits
 }
 
 extension SettingsPage {
@@ -299,7 +299,7 @@ enum FeatureVisibilitySupport {
         case .screenshot: return [.screenshot, .screenRecorder, .screenOCR, .colorPicker]
         case .radialMenu: return [.radialMenu]
         case .commandBar: return [.commandBar]
-        case .dashboard, .general, .features, .notch, .shortcuts, .advanced, .about, .releaseNotes, .support:
+        case .dashboard, .general, .features, .notch, .shortcuts, .advanced, .about, .releaseNotes, .credits:
             return []
         }
     }

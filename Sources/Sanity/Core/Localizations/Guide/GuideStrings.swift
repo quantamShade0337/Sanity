@@ -45,6 +45,9 @@ enum GuideKey: String, CaseIterable {
     case batteryCharging, batteryCharged, batteryNotCharging, batteryLowPower
     case panelSound, openSanity, mute, unmute, systemVolume, noSoftwareVolume, everythingElse
     case notchNeedsAccessibility
+    // Credits
+    case creditsTab, creditsIntro, creditsBuiltOn, creditsVorssaintRole, creditsBoringNotchRole
+    case creditsIncluded, creditsLibraries, creditsViewLicenses, creditsSourceCode, creditsNotAffiliated
     // Page summaries
     case sumGeneral, sumFeatures, sumEnergy, sumMonitor, sumMouse, sumSwitcher, sumWindowLayout
     case sumAutoQuit, sumQuitProtection, sumClipboard, sumCutPaste, sumShelf, sumMedia
@@ -55,7 +58,9 @@ enum GuideKey: String, CaseIterable {
 
 enum GuideText {
     static func table(_ language: AppLanguage) -> [GuideKey: String] {
-        let extra = GuideStrings.dashboardStatus[language == .zhHK ? .zhTW : language] ?? [:]
+        let key = language == .zhHK ? .zhTW : language
+        let extra = (GuideStrings.dashboardStatus[key] ?? [:])
+            .merging(GuideStrings.credits[key] ?? [:]) { first, _ in first }
         return baseTable(language).merging(extra) { base, _ in base }
     }
 
@@ -79,7 +84,7 @@ enum GuideText {
 
     /// The string for `key` in `language`, falling back to English.
     static func t(_ key: GuideKey, _ language: AppLanguage = L10n.shared.language) -> String {
-        table(language)[key] ?? GuideStrings.enUS[key] ?? key.rawValue
+        table(language)[key] ?? GuideStrings.enUS[key] ?? GuideStrings.credits[.enUS]?[key] ?? key.rawValue
     }
 
     /// A format string from the table filled with `args` (all `%@`).

@@ -19,7 +19,7 @@ enum SettingsPageGuide {
         switch page {
         // The Dashboard explains itself; the Notch page draws its own header;
         // About, Release Notes and Support need no introduction.
-        case .dashboard, .notch, .about, .releaseNotes, .support: return nil
+        case .dashboard, .notch, .about, .releaseNotes, .credits: return nil
         case .general: return .sumGeneral
         case .features: return .sumFeatures
         case .energy: return .sumEnergy

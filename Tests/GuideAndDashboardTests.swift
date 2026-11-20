@@ -38,7 +38,7 @@ final class GuideStringsTests: XCTestCase {
 
 final class SettingsPageGuideTests: XCTestCase {
     /// Pages that intentionally have no summary header.
-    private let headerless: Set<SettingsPage> = [.dashboard, .notch, .about, .releaseNotes, .support]
+    private let headerless: Set<SettingsPage> = [.dashboard, .notch, .about, .releaseNotes, .credits]
 
     func testEveryOtherPageHasASummary() {
         for page in SettingsPage.allCases where !headerless.contains(page) {

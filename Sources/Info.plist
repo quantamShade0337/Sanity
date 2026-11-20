@@ -70,7 +70,7 @@
   <key>NSCameraUseContinuityCameraDeviceType</key>
   <true/>
   <key>NSHumanReadableCopyright</key>
-  <string>Sanity is derived from GPL-licensed Vorssaint code.</string>
+  <string>© 2026 Ethan Soh. Free software under the GPL, based on Vorssaint and Boring Notch.</string>
   <key>SanityFanControlHelperVersion</key>
   <string>$(CURRENT_PROJECT_VERSION)</string>
 </dict>

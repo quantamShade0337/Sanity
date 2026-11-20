@@ -658,48 +658,6 @@ enum UpdateHighlightsInfo {
     }
 }
 
-enum SupportUpdateIntroInfo {
-    /// The single release whose first launch shows the update intro. It used
-    /// to track AppInfo.version, which re-showed the ask on every update; now a
-    /// release only shows it when this constant is deliberately bumped.
-    static let releaseVersion = "3.3.2"
-
-    static func shouldShow(appVersion: String, lastSeenVersion: String?) -> Bool {
-        appVersion == releaseVersion && lastSeenVersion != releaseVersion
-    }
-}
-
-enum SupportUpdateIntroStep: CaseIterable, Hashable {
-    case discord
-    case social
-    case support
-
-    /// Steps whose link is configured in AppInfo; support is always shown.
-    var isAvailable: Bool {
-        switch self {
-        case .discord: return AppInfo.discordURL != nil
-        case .social: return AppInfo.socialURL != nil
-        case .support: return true
-        }
-    }
-
-    static var first: SupportUpdateIntroStep {
-        allCases.first(where: \.isAvailable) ?? .support
-    }
-
-    var next: SupportUpdateIntroStep? {
-        let steps = Self.allCases.filter(\.isAvailable)
-        guard let index = steps.firstIndex(of: self), index + 1 < steps.count else { return nil }
-        return steps[index + 1]
-    }
-
-    var previous: SupportUpdateIntroStep? {
-        let steps = Self.allCases.filter(\.isAvailable)
-        guard let index = steps.firstIndex(of: self), index > 0 else { return nil }
-        return steps[index - 1]
-    }
-}
-
 enum KeepAwakeIconTint: String, CaseIterable, Identifiable {
     case orange, green, blue, purple, pink, none
 

@@ -36,7 +36,7 @@ final class DashboardSnapshotTests: XCTestCase {
             ("window-general-min", .general, .aqua, NSSize(width: 780, height: 640)),
             ("window-about", .about, .aqua, window),
             ("window-whatsnew", .releaseNotes, .aqua, window),
-            ("window-support", .support, .aqua, window),
+            ("window-credits", .credits, .aqua, window),
             ("window-energy", .energy, .aqua, window),
             ("window-shortcuts", .shortcuts, .aqua, window),
         ] {

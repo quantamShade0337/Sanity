@@ -150,9 +150,13 @@ struct DashboardView: View {
                 .accessibilityHidden(true)
             eyebrow(Self.computerName ?? t(.thisMac))
             Spacer(minLength: Space.m)
-            eyebrow(GuideText.f(.dashSubtitle, "", Self.duration(ProcessInfo.processInfo.systemUptime),
-                                language: lang)
-                .trimmingCharacters(in: CharacterSet(charactersIn: " ·")))
+            Text(GuideText.f(.dashSubtitle, "", Self.duration(ProcessInfo.processInfo.systemUptime),
+                             language: lang)
+                .trimmingCharacters(in: CharacterSet(charactersIn: " ·"))
+                .capitalizedFirst)
+                .font(Typo.secondary)
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
         }
     }
 
@@ -193,22 +197,20 @@ struct DashboardView: View {
                                                 : PanelMetricColor.orange(for: scheme)
         let detail = status.detailArgument.map { GuideText.f(status.detailKey, $0, language: lang) }
             ?? t(status.detailKey)
+        // Healthy needs no ornament: the sentence says it. A problem gets one
+        // inline warning glyph, so the headline stays flush with the column.
+        let headline: Text = status.level == .good
+            ? Text(t(status.title))
+            : Text(Image(systemName: "exclamationmark.triangle.fill")).foregroundColor(tint)
+                + Text(" ") + Text(t(status.title))
         return HStack(alignment: .center, spacing: Space.l) {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(alignment: .firstTextBaseline, spacing: 10) {
-                    Circle()
-                        .fill(tint)
-                        .frame(width: 9, height: 9)
-                        .alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] + 7 }
-                        .accessibilityHidden(true)
-                    Text(t(status.title))
-                        .font(Typo.display)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+            VStack(alignment: .leading, spacing: 4) {
+                headline
+                    .font(Typo.display)
+                    .fixedSize(horizontal: false, vertical: true)
                 Text(detail)
                     .font(Typo.body)
                     .foregroundStyle(.secondary)
-                    .padding(.leading, 19)
                     .fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 0)
@@ -367,12 +369,11 @@ struct DashboardView: View {
 
     private func readingView(_ item: Reading) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(item.label.uppercased(with: Locale.current))
-                .font(Typo.eyebrow)
-                .tracking(Typo.eyebrowTracking)
+            Text(item.label)
+                .font(Typo.secondary.weight(.medium))
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
-            HStack(alignment: .firstTextBaseline, spacing: 2) {
+            HStack(alignment: .firstTextBaseline, spacing: item.unit == "%" ? 1 : 4) {
                 Text(item.number)
                     .font(Typo.metric)
                 Text(item.unit)
@@ -381,7 +382,7 @@ struct DashboardView: View {
             }
             .lineLimit(1)
             .minimumScaleFactor(0.7)
-            .padding(.top, 6)
+            .padding(.top, 4)
             Text(item.caption.isEmpty ? " " : item.caption)
                 .font(Typo.secondary)
                 .foregroundStyle(item.severity.label(scheme))
@@ -405,7 +406,7 @@ struct DashboardView: View {
             Sparkline(values: values,
                       color: item.severity == .normal ? brand : item.severity.tint(scheme),
                       maxValue: item.id == "power" ? nil : 1,
-                      fillOpacity: 0.14, lineWidth: 1.5, showsZeroBaseline: true)
+                      fillOpacity: 0.06, lineWidth: 1.5)
                 .accessibilityHidden(true)
         case .remaining(let fraction):
             VStack {
@@ -485,6 +486,7 @@ struct DashboardView: View {
                     } label: {
                         Text(processSort == .cpu ? t(.processor) : t(.memory))
                             .font(Typo.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     .menuStyle(.borderlessButton)
                     .menuIndicator(.visible)
@@ -512,6 +514,7 @@ struct DashboardView: View {
     /// Refreshes the process lists off the main thread while the page is
     /// visible. The `.task` modifier cancels this loop on disappear.
     private func refreshProcessesLoop() async {
+        var attempts = 0
         while !Task.isCancelled {
             let interval = TimeInterval(SanityDefaults.sanitizedMonitorInterval(monitorInterval))
             let cpuPercent = monitor.snapshot.cpuUsage.map { $0 * 100 }
@@ -527,8 +530,14 @@ struct DashboardView: View {
             guard !Task.isCancelled else { return }
             if !rows.0.isEmpty || topCPU.isEmpty { topCPU = rows.0 }
             if !rows.1.isEmpty || topMemory.isEmpty { topMemory = rows.1 }
-            processesLoaded = true
-            try? await Task.sleep(for: .seconds(max(3, interval * 2)))
+            attempts += 1
+            // Processor usage needs two samples, so the first pass is often
+            // empty: keep saying "Sampling…" and retry soon rather than
+            // flashing "Nothing to show" on open.
+            let current = processSort == .cpu ? topCPU : topMemory
+            if !current.isEmpty || attempts >= 4 { processesLoaded = true }
+            let wait = current.isEmpty ? 1.0 : max(3, interval * 2)
+            try? await Task.sleep(for: .seconds(wait))
         }
     }
 
@@ -567,6 +576,9 @@ struct DashboardView: View {
 
     // MARK: - Details
 
+    /// The one separator used between values in a row.
+    private static let separator = " · "
+
     private struct DetailRow: Identifiable {
         let id: String
         let label: String
@@ -575,12 +587,14 @@ struct DashboardView: View {
 
     private var detailRows: [DetailRow] {
         var rows: [DetailRow] = []
-        if showsCPU, let cpuTemp = snapshot.cpuTemperature {
-            rows.append(DetailRow(id: "cputemp", label: t(.processor), value: temp(cpuTemp)))
+        if showsCPU, let cpu = snapshot.cpuUsage {
+            let value = [MetricFormat.percent(cpu), snapshot.cpuTemperature.map(temp)]
+                .compactMap { $0 }.joined(separator: Self.separator)
+            rows.append(DetailRow(id: "cpu", label: t(.processor), value: value))
         }
         if features.isAvailable(.monitorGPU), let gpu = snapshot.gpuUsage {
             let value = [MetricFormat.percent(gpu), snapshot.gpuTemperature.map(temp)]
-                .compactMap { $0 }.joined(separator: "  ·  ")
+                .compactMap { $0 }.joined(separator: Self.separator)
             rows.append(DetailRow(id: "gpu", label: t(.graphics), value: value))
         }
         if showsMemory, let used = snapshot.memoryUsed, let total = snapshot.memoryTotal {
@@ -591,7 +605,8 @@ struct DashboardView: View {
         if features.isAvailable(.monitorNetwork), let down = snapshot.netDownBytesPerSec,
            let up = snapshot.netUpBytesPerSec {
             rows.append(DetailRow(id: "net", label: t(.network),
-                                  value: "↓ \(MetricFormat.bytesPerSec(down))    ↑ \(MetricFormat.bytesPerSec(up))"))
+                                  value: "↓ \(MetricFormat.bytesPerSec(down))" + Self.separator
+                                      + "↑ \(MetricFormat.bytesPerSec(up))"))
         }
         if features.isAvailable(.monitorDisk), let reading = snapshot.disk {
             let read = reading.uniqueIODevices.compactMap(\.readBytesPerSec).reduce(0, +)
@@ -608,7 +623,7 @@ struct DashboardView: View {
             if let cycles = power.cycleCount { parts.append("\(cycles) cycles") }
             if let watts = power.systemWatts { parts.append(MetricFormat.watts(watts)) }
             if !parts.isEmpty {
-                rows.append(DetailRow(id: "power", label: t(.battery), value: parts.joined(separator: "  ·  ")))
+                rows.append(DetailRow(id: "power", label: t(.battery), value: parts.joined(separator: Self.separator)))
             }
         }
         for drive in otherDrives {
@@ -797,18 +812,16 @@ private struct SetupLine: View {
         let steps = steps
         let done = steps.filter(\.isDone).count
         if let next = steps.first(where: { !$0.isDone }) {
-            HStack(spacing: 8) {
+            // Reads as one sentence: progress (opens the checklist), the next
+            // step as a link, and Hide right beside what it hides.
+            HStack(spacing: 6) {
                 Button {
                     showingSteps.toggle()
                 } label: {
-                    HStack(spacing: 6) {
-                        ProgressRing(fraction: Double(done) / Double(steps.count),
-                                     tint: SanityDesign.brand(scheme))
-                        Text(GuideText.f(.gsProgress, "\(done)", "\(steps.count)", language: l10n.language))
-                            .monospacedDigit()
-                            .foregroundStyle(.secondary)
-                    }
-                    .contentShape(Rectangle())
+                    Text(GuideText.f(.gsProgress, "\(done)", "\(steps.count)", language: l10n.language))
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .help(t(.allSteps))
@@ -830,15 +843,14 @@ private struct SetupLine: View {
                 .buttonStyle(.plain)
                 .help(next.detail)
 
-                Spacer(minLength: SanityDesign.Space.s)
+                Text("·").foregroundStyle(.tertiary)
 
                 Button(t(.hide), action: onDismiss)
                     .buttonStyle(.plain)
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                     .help(t(.hideHelp))
             }
             .font(SanityDesign.Typography.secondary)
-            .padding(.leading, 19)
             .onAppear {
                 permissions.refresh()
                 launchesAtLogin = LaunchAtLogin.isEnabled
@@ -875,22 +887,5 @@ private struct SetupLine: View {
         }
         .padding(SanityDesign.Space.m)
         .frame(width: 320, alignment: .leading)
-    }
-}
-
-private struct ProgressRing: View {
-    let fraction: Double
-    let tint: Color
-
-    var body: some View {
-        ZStack {
-            Circle().stroke(Color.primary.opacity(0.12), lineWidth: 2)
-            Circle()
-                .trim(from: 0, to: max(0.02, fraction))
-                .stroke(tint, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                .rotationEffect(.degrees(-90))
-        }
-        .frame(width: 11, height: 11)
-        .accessibilityHidden(true)
     }
 }

@@ -38,6 +38,13 @@ final class DashboardSnapshotTests: XCTestCase {
             router.page = page
             try render(SettingsView(), name: name, appearance: appearance, size: size, settle: 6)
         }
+        let detailsKey = "dashboardDetailsExpanded"
+        let detailsWas = UserDefaults.standard.object(forKey: detailsKey)
+        defer {
+            if let detailsWas { UserDefaults.standard.set(detailsWas, forKey: detailsKey) }
+            else { UserDefaults.standard.removeObject(forKey: detailsKey) }
+        }
+        UserDefaults.standard.set(true, forKey: detailsKey)
         try render(DashboardView(), name: "dashboard-full", appearance: .aqua,
                    size: NSSize(width: 840, height: 1400), settle: 3)
     }

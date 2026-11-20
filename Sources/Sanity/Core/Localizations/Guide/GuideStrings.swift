@@ -98,7 +98,7 @@ extension GuideStrings {
         .customize: "Customize",
         .memory: "Memory",
         .network: "Network",
-        .diskActivity: "Disk Activity",
+        .diskActivity: "Disk activity",
         .battery: "Battery",
         .power: "Power",
         .storage: "Storage",

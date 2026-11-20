@@ -8,7 +8,8 @@ decision this page doesn't cover, copy what the Dashboard does.
 ## Principles
 
 1. **One focal point per screen.** The Dashboard's is a single sentence about
-   the Mac's health. Everything else supports it.
+   the Mac's health. Everything else supports it. A healthy state needs no
+   ornament; only a problem earns an inline warning glyph.
 2. **Native first.** Grouped `Form`s for settings, system controls, page
    names in the window title bar. Custom views only where macOS has no
    equivalent.
@@ -33,7 +34,8 @@ decision this page doesn't cover, copy what the Dashboard does.
 | Role | Spec | Use |
 |---|---|---|
 | `display` | 22 pt semibold | The one sentence a screen leads with |
-| `eyebrow` | 11 pt semibold, uppercase, 0.6 tracking, secondary | Section and reading labels |
+| `eyebrow` | 11 pt semibold, uppercase, 0.6 tracking, secondary | Section labels and the identity line only |
+| reading label | 12 pt medium, sentence case, secondary | Labels above a single value |
 | `metric` + `metricUnit` | 28 pt / 14 pt SF Pro Rounded, tabular | Readings: unit smaller and secondary |
 | `section` | 13 pt semibold | Popover and inline titles |
 | `body` / `secondary` / `caption` | 13 / 12 / 11 pt | Everything else |
@@ -49,10 +51,14 @@ decision this page doesn't cover, copy what the Dashboard does.
 ## Data display
 
 - **Fast-changing values** (processor, memory, power) get a 22 pt history
-  line in Sanity Indigo, which turns orange or red when unhealthy.
+  line in Sanity Indigo with a barely-there fill, which turns orange or red
+  when unhealthy.
 - **Capacities** (storage, battery) get a 3 pt bar showing **what is left**,
   neutral grey unless low.
 - **Durations** use one style everywhere ("4d 3h", "2h 37m").
+- **Values in one row** are separated by " · ", always with single spaces.
+- **Loading** says "Sampling…" until real data arrives; never an empty state
+  for data that is merely slow.
 - **Process lists** show apps, merged by name. System daemons collapse into a
   single "Background processes" row.
 
@@ -61,6 +67,8 @@ decision this page doesn't cover, copy what the Dashboard does.
 - Double-click an app row to bring it forward. Right-click or hover to Quit.
 - Sort and filter options are borderless menus in the section's label row.
 - Disclosure labels use the eyebrow style with a trailing chevron.
+- Inline actions read as a sentence: "0 of 4 done · Next step › · Hide", with
+  the dismiss control beside what it dismisses, never pushed to the far edge.
 - Honour Reduce Motion for every animation.
 
 ## Notch alerts
